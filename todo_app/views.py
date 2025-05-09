@@ -80,3 +80,10 @@ def edit_task(request, task_id):
         'form': form,
         'task': task
     })
+
+def restore_task(request, task_id):
+    task = get_object_or_404(Task, pk=task_id, is_deleted=True)
+    task.is_deleted = False
+    task.deleted_at = None
+    task.save()
+    return redirect('deleted_task_list')
