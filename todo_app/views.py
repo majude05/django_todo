@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Task, Tag
 from .forms import TaskForm
 from django.utils import timezone
+import json
 
 # Create your views here.
 def task_list(request, tag_name=None):
@@ -86,4 +87,17 @@ def restore_task(request, task_id):
     task.is_deleted = False
     task.deleted_at = None
     task.save()
+    return redirect('deleted_task_list')
+
+def delete_all_tasks(request):
+    if request.method == 'POST':
+        Task.objects.filter(is_deleted=True).delete()
+        return redirect('deleted_task_list')
+    
+def bulk_delete_tasks(request):
+    if request.method == 'POST':
+        task_ids_json = request.POST.get('task_ids')
+        if task_ids_json:
+            task_ids = json.loads(task_ids_json)
+            Task.objects.filter(id__in=task_ids, is_deleted=True).delete()
     return redirect('deleted_task_list')

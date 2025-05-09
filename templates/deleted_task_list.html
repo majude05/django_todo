@@ -1,14 +1,42 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'css/deleted_tasks.css' %}">
     <title>削除済みタスク一覧</title>
 </head>
 <body>
     <h1>削除済みタスク一覧</h1>
-    <ul>
+
+    <div>
+        <button id = "select-tasks" data-selecting="false">選択</button>
+        <input type="checkbox" id="select-all" style="display: none;"> 
+        <label for="select-all" id="select-all-label" style="display: none;">すべて選択</label> 
+        <button id="delete-selected" style="display: none; color: red; font-weight: bold;">選択したタスクを完全に削除</button> 
+        <form id="bulk-delete-form" method="post" action="{% url 'bulk_delete_tasks' %}" style="display: none;">
+            {% csrf_token %}
+            <input type="hidden" name="task_ids" id="task-ids">
+        </form>
+
+        
+        <!---
+        <form id="delete-all-form" method="post" action="{% url 'delete_all_tasks' %}" style="display: inline-block;">
+            {% csrf_token %}
+            <button type="submit" id="delete-all" style="color: red;">すべてのタスクを完全に削除</button>
+        </form>
+    -->
+
+    
+
+    </div>
+
+    <br>
+
+    <ul class = "deleted-task-list">
         {% for task in deleted_tasks %}
             <li>
+                <input type="checkbox" class="task-checkbox" value="{{ task.id }}" style="display: none;">
                 <del>{{ task.title }}</del>
                 {% if task.due_date %}
                     <small>削除日時：{{ task.deleted_at|date:"Y-m-d H:i" }}</small>
@@ -26,5 +54,7 @@
         {% endfor %}
     </ul>
     <a href="{% url 'task_list' %}">タスク一覧に戻る</a>
+
+    <script src="{% static 'js/deleted_tasks.js' %}"></script>
 </body>
 </html>

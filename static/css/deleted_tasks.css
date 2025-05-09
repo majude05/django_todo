@@ -1,0 +1,35 @@
+/* 削除済みタスク一覧のul要素のスタイル */
+ul.deleted-task-list { /* HTMLのulタグに class="deleted-task-list" を追加することを想定 */
+    list-style-type: none; /* リストマーカー（・）を非表示にする */
+    padding-left: 0;       /* 左側の余白をなくす (必要に応じて調整) */
+}
+
+/* 各タスクアイテム (li要素) のスタイル */
+ul.deleted-task-list li {
+    /* 必要であれば、li要素自体のスタイルもここに記述 */
+    margin-bottom: 8px; /* タスク間の余白など */
+}
+
+/* タスクごとのチェックボックスのスタイル */
+ul.deleted-task-list li .task-checkbox { /* inputタグに class="task-checkbox" がある前提 */
+    margin-right: 5px;       /* チェックボックスとタスクタイトルの間の余白 */
+    vertical-align: middle;  /* 他の要素と縦方向中央で揃える */
+}
+
+/* タスクタイトルのスタイル (delタグ) */
+ul.deleted-task-list li del {
+    vertical-align: middle;  /* 他の要素と縦方向中央で揃える */
+    /* display: inline-block; などが必要な場合もあります */
+}
+
+/* 削除日時のスタイル (smallタグ) */
+ul.deleted-task-list li small {
+    vertical-align: middle;  /* 他の要素と縦方向中央で揃える */
+    margin-left: 10px;       /* タイトルとの間の余白 */
+    /* display: inline-block; などが必要な場合もあります */
+}
+
+/* タスク説明のスタイル (pタグ) - これは改行されても良いので、特に変更不要なことが多い */
+ul.deleted-task-list li p {
+    margin-left: 25px; /* チェックボックスの幅を考慮したインデントなど */
+}
