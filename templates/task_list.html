@@ -7,7 +7,7 @@
 <body>
     <h1>タスク一覧</h1>
     <ul>
-        {% for task in tasks %}
+        {% for task in incomplete_tasks %}
             <li>
                 <form method="post" action="{% url 'toggle_task' task.id %}">
                     {% csrf_token %}
@@ -25,6 +25,29 @@
             <li>まだタスクはありません。</li>
         {% endfor %}
     </ul>
+
+    <h2>完了済みタスク</h2>
+    <ul>
+        {% for task in completed_tasks %}
+            <li>
+                <form method="post" action="{% url 'toggle_task' task.id %}">
+                    {% csrf_token %}
+                    <input type="checkbox" name="is_completed" {% if task.is_completed %}checked{% endif %} onchange="this.form.submit()">
+                    <del>{{ task.title }}</del>
+                    {{ task.title }}
+                    {% if task.due_date %}
+                        <small>締め切り：{{ task.due_date|date:"Y-m-d H:i" }}</small>
+                    {% endif %}
+                    {% if task.description %}
+                        <p>{{ task.description }}</p>
+                    {% endif %}
+                </form>
+            </li>
+        {% empty %}
+            <li>完了済みのタスクはありません。</li>
+        {% endfor %}
+    </ul>
+
     <a href="{% url 'add_task' %}">新しいタスクを追加</a>
 </body>
 </html>
