@@ -4,8 +4,12 @@ from .forms import TaskForm
 
 # Create your views here.
 def task_list(request):
-    tasks = Task.objects.all()
-    return render(request, 'task_list.html', {'tasks': tasks})
+    incomplete_tasks = Task.objects.filter(is_completed=False)
+    completed_tasks = Task.objects.filter(is_completed=True)
+    return render(request, 'task_list.html', {
+        'incomplete_tasks': incomplete_tasks,
+        'completed_tasks': completed_tasks
+    })
 
 def add_task(request):
     if request.method == 'POST':
@@ -23,7 +27,7 @@ def add_task(request):
     return render(request, 'add_task.html', {'form': form})
 
 def toggle_task(request, task_id):
-    task = get_object_or_404(Task, pk=task_id)
+    task = get_object_or_404(Task, id=task_id)
     task.is_completed = not task.is_completed
     task.save()
     return redirect('task_list')
