@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>タスク編集</title>
+</head>
+<body>
+    <h1>タスク編集</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">保存</button>
+    </form>
+    <a href="{% url 'task_list' %}">タスク一覧に戻る</a>
+    
+</body>
+</html>

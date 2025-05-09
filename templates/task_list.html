@@ -40,6 +40,7 @@
                     {% csrf_token %}
                     <button type="submit" style="color: red;">削除</button>
                 </form>
+                <a href="{% url 'edit_task' task.id %}">編集</a>
                 </li>
         {% empty %}
             <li>まだタスクはありません。</li>
@@ -73,6 +74,7 @@
                     {% csrf_token %}
                     <button type="submit" style="color: red;">削除</button>
                 </form>
+                
             </li>
         {% empty %}
             <li>完了済みのタスクはありません。</li>

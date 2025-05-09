@@ -52,3 +52,31 @@ def deleted_task_list(request):
     return render(request, 'deleted_task_list.html', {
         'deleted_tasks': deleted_tasks
     })
+
+def edit_task(request, task_id):
+    task = get_object_or_404(Task, pk=task_id)
+    if request.method == 'POST':
+        form = TaskForm(request.POST, initial={
+            'title': task.title,
+            'description': task.description,
+            'due_date': task.due_date.strftime('%Y-%m-%dT%H:%M') if task.due_date else None,
+            'tags': task.tags.all()
+        })
+        if form.is_valid():
+            task.title = form.cleaned_data['title']
+            task.description = form.cleaned_data['description']
+            task.due_date = form.cleaned_data['due_date']
+            task.tags.set(form.cleaned_data['tags'])
+            task.save()
+            return redirect('task_list')
+    else:
+        form = TaskForm(initial={
+            'title': task.title,
+            'description': task.description,
+            'due_date': task.due_date.strftime('%Y-%m-%dT%H:%M') if task.due_date else None,
+            'tags': task.tags.all()
+        })
+    return render(request, 'edit_task.html', {
+        'form': form,
+        'task': task
+    })
