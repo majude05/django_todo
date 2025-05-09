@@ -22,6 +22,7 @@ def add_task(request):
                 due_date=form.cleaned_data['due_date']
             )
             task.save()
+            task.tags.set(form.cleaned_data['tags'])
             return redirect('task_list')
     else:
         form = TaskForm()
