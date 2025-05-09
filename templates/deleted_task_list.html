@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>削除済みタスク一覧</title>
+</head>
+<body>
+    <h1>削除済みタスク一覧</h1>
+    <ul>
+        {% for task in deleted_tasks %}
+            <li>
+                <del>{{ task.title }}</del>
+                {% if task.due_date %}
+                    <small>削除日時：{{ task.deleted_at|date:"Y-m-d H:i" }}</small>
+                {% endif %}
+                {% if task.description %}
+                    <p>{{ task.description }}</p>
+                {% endif %}
+            </li>
+        {% empty %}
+            <li>削除済みのタスクはありません。</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'task_list' %}">タスク一覧に戻る</a>
+</body>
+</html>

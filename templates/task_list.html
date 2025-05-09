@@ -20,7 +20,11 @@
                         <p>{{ task.description }}</p>
                     {% endif %}
                 </form>
-            </li>
+                <form method="post" action="{% url 'delete_task' task.id %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" style="color: red;">削除</button>
+                </form>
+                </li>
         {% empty %}
             <li>まだタスクはありません。</li>
         {% endfor %}
@@ -42,6 +46,10 @@
                         <p>{{ task.description }}</p>
                     {% endif %}
                 </form>
+                <form method="post" action="{% url 'delete_task' task.id %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" style="color: red;">削除</button>
+                </form>
             </li>
         {% empty %}
             <li>完了済みのタスクはありません。</li>
@@ -49,5 +57,7 @@
     </ul>
 
     <a href="{% url 'add_task' %}">新しいタスクを追加</a>
+    <br>
+    <a href="{% url 'deleted_task_list' %}">削除済みタスク一覧</a>
 </body>
 </html>
