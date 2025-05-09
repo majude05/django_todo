@@ -25,4 +25,5 @@ urlpatterns = [
     path('toggle/<int:task_id>/', toggle_task, name='toggle_task'),
     path('delete/<int:task_id>/', delete_task, name='delete_task'),
     path('deleted/', deleted_task_list, name='deleted_task_list'),
+    path('tag/<str:tag_name>/', task_list, name='task_list_by_tag'),
 ]

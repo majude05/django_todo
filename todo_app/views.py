@@ -1,15 +1,23 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Task
+from .models import Task, Tag
 from .forms import TaskForm
 from django.utils import timezone
 
 # Create your views here.
-def task_list(request):
+def task_list(request, tag_name=None):
     incomplete_tasks = Task.objects.filter(is_completed=False, is_deleted=False)
     completed_tasks = Task.objects.filter(is_completed=True, is_deleted=False)
+    if tag_name:
+        incomplete_tasks = incomplete_tasks.filter(tags__name=tag_name)
+        completed_tasks = completed_tasks.filter(tags__name=tag_name)
+
+    tags = Tag.objects.all()
+
     return render(request, 'task_list.html', {
         'incomplete_tasks': incomplete_tasks,
-        'completed_tasks': completed_tasks
+        'completed_tasks': completed_tasks,
+        'tags': tags,
+        'current_tag': tag_name,
     })
 
 def add_task(request):
