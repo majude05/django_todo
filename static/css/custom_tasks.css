@@ -29,6 +29,12 @@ h1:first-child, h2:first-child {
     margin-top: 0;
 }
 
+h2 .task-count {
+    margin-left: 10px;
+    font-size: 0.8em;
+    color: #777;
+    font-weight: normal;
+}
 /* --- タグ絞り込み部分 --- */
 .tag-filter {
     margin-bottom: 20px;

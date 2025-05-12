@@ -4,21 +4,22 @@
 <head>
     <meta charset="UTF-8">
     <title>タスク一覧</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> {# レスポンシブ対応のためビューポート設定 #}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel ="stylesheet" href="{% static 'css/custom_tasks.css' %}">
 </head>
 <body>
-    <div class="container"> {# 全体をコンテナで囲む #}
+    <div class="container">
         <h1>タスク一覧</h1>
 
         <div class="tag-filter">
             <strong>タグで絞り込む:</strong>
             <a href="{% url 'task_list' %}" {% if not current_tag %}class="active-tag"{% endif %}>すべて</a>
-            {% for tag_item in tags %}
+            {% for tag_item in tags %} {# ループ変数を tag_item に（前回提案通り） #}
                 <a href="{% url 'task_list_by_tag' tag_item.name %}" {% if current_tag == tag_item.name %}class="active-tag"{% endif %}>{{ tag_item.name }}</a>
             {% endfor %}
         </div>
 
+        <h2>未完了のタスク <span class="task-count">({{ incomplete_tasks_count }}件)</span></h2> {# ★件数を表示★ #}
         <ul class="task-list-ul">
             {% for task in incomplete_tasks %}
                 <li>
@@ -37,18 +38,19 @@
                             {% endif %}
                             {% if task.tags.all %}
                                 <div class="task-tags-container">
-                                    {% for tag_item_inner in task.tags.all %}
+                                    {% for tag_item_inner in task.tags.all %} {# ループ変数を tag_item_inner に #}
                                         <span class="task-tag">{{ tag_item_inner.name }}</span>
                                     {% endfor %}
+                                </div>
                             {% endif %}
                         </div>
                     </div>
                     <div class="task-actions-container">
                         <form method="post" action="{% url 'delete_task' task.id %}" class="task-delete-form">
                             {% csrf_token %}
-                            <button type="submit" class="button button-delete">削除</button> {# 共通クラス button を追加 #}
+                            <button type="submit" class="button button-delete">削除</button>
                         </form>
-                        <a href="{% url 'edit_task' task.id %}" class="button button-edit">編集</a> {# 共通クラス button を追加 #}
+                        <a href="{% url 'edit_task' task.id %}" class="button button-edit">編集</a>
                     </div>
                 </li>
             {% empty %}
@@ -56,7 +58,7 @@
             {% endfor %}
         </ul>
 
-        <h2>完了済みタスク</h2>
+        <h2>完了済みタスク <span class="task-count">({{ completed_tasks_count }}件)</span></h2> {# ★件数を表示★ #}
         <ul class="completed-task-list-ul">
             {% for task in completed_tasks %}
                 <li>
@@ -75,7 +77,7 @@
                             {% endif %}
                             {% if task.tags.all %}
                                 <div class="task-tags-container">
-                                    {% for tag_item_inner in task.tags.all %}
+                                    {% for tag_item_inner in task.tags.all %} {# ループ変数を tag_item_inner に #}
                                         <span class="task-tag">{{ tag_item_inner.name }}</span>
                                     {% endfor %}
                                 </div>
@@ -85,7 +87,7 @@
                     <div class="task-actions-container">
                         <form method="post" action="{% url 'delete_task' task.id %}" class="task-delete-form">
                             {% csrf_token %}
-                            <button type="submit" class="button button-delete">削除</button> {# 共通クラス button を追加 #}
+                            <button type="submit" class="button button-delete">削除</button>
                         </form>
                         {# <a href="{% url 'edit_task' task.id %}" class="button button-edit">編集</a> #}
                     </div>
@@ -95,10 +97,10 @@
             {% endfor %}
         </ul>
 
-        <div class="page-actions"> {# ページ下部のアクションリンクをまとめる #}
-            <a href="{% url 'add_task' %}">新しいタスクを追加</a>
-            <a href="{% url 'deleted_task_list' %}">削除済みタスク一覧</a>
+        <div class="page-actions">
+            <a href="{% url 'add_task' %}" class="button button-primary">新しいタスクを追加</a> {# button-primary を適用（例） #}
+            <a href="{% url 'deleted_task_list' %}" class="button">削除済みタスク一覧</a>
         </div>
-    </div> {# container の閉じタグ #}
+    </div>
 </body>
 </html>

@@ -6,20 +6,34 @@ import json
 
 # Create your views here.
 def task_list(request, tag_name=None):
-    incomplete_tasks = Task.objects.filter(is_completed=False, is_deleted=False)
-    completed_tasks = Task.objects.filter(is_completed=True, is_deleted=False)
+    incomplete_tasks_query = Task.objects.filter(is_completed=False, is_deleted=False)
+    completed_tasks_query = Task.objects.filter(is_completed=True, is_deleted=False)
+    
     if tag_name:
-        incomplete_tasks = incomplete_tasks.filter(tags__name=tag_name)
-        completed_tasks = completed_tasks.filter(tags__name=tag_name)
+        tag = get_object_or_404(Tag, name=tag_name)
+        incomplete_tasks_query = incomplete_tasks_query.filter(tags=tag)
+        completed_tasks_query = completed_tasks_query.filter(tags=tag)
+
+    incomplete_tasks_list = incomplete_tasks_query.order_by('due_date', '-created_at')
+    completed_tasks_list = completed_tasks_query.order_by('-created_at')
+
+    incomplete_count = incomplete_tasks_query.count()
+    completed_count = completed_tasks_query.count()
+
+
 
     tags = Tag.objects.all()
 
-    return render(request, 'task_list.html', {
-        'incomplete_tasks': incomplete_tasks,
-        'completed_tasks': completed_tasks,
+    context = {
+        'incomplete_tasks': incomplete_tasks_list,
+        'completed_tasks': completed_tasks_list,
+        'incomplete_tasks_count': incomplete_count,
+        'completed_tasks_count': completed_count,
         'tags': tags,
         'current_tag': tag_name,
-    })
+    }
+
+    return render(request, 'task_list.html', context)
 
 def add_task(request):
     if request.method == 'POST':
