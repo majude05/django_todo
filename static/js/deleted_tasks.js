@@ -2,41 +2,78 @@ document.addEventListener("DOMContentLoaded", function () {
     const selectButton = document.getElementById("select-tasks");
     const deleteSelectedButton = document.getElementById("delete-selected");
     const bulkDeleteForm = document.getElementById("bulk-delete-form");
-    const allCheckbox = document.getElementById("select-all");
-    const allCheckboxLabel = document.getElementById("select-all-label"); // ラベルも取得
+    const allCheckbox = document.getElementById("select-all"); // <input type="checkbox"> 本体
+    const allCheckboxLabelContainer = document.getElementById("select-all-label-container"); // <label> コンテナ
+    // const selectedCountDisplay = document.getElementById('selected-count-display'); // もし選択件数表示を追加する場合
 
-    
+    // 「すべて選択」チェックボックスの状態を更新する関数
+    function updateSelectAllCheckboxVisualState() {
+        if (!allCheckbox) return;
+
+        const taskCheckboxes = document.querySelectorAll(".task-checkbox");
+        if (!taskCheckboxes.length) { // タスクが一つもない場合
+            allCheckbox.checked = false;
+            allCheckbox.indeterminate = false;
+            return;
+        }
+
+        const checkedCount = Array.from(taskCheckboxes).filter(cb => cb.checked).length;
+
+        if (checkedCount === 0) {
+            allCheckbox.checked = false;
+            allCheckbox.indeterminate = false;
+        } else if (checkedCount === taskCheckboxes.length) {
+            allCheckbox.checked = true;
+            allCheckbox.indeterminate = false;
+        } else {
+            allCheckbox.checked = false; // または true のまま中間状態を表示するならそれでも可
+            allCheckbox.indeterminate = true;
+        }
+    }
+
+    // 選択されているアイテム数を表示する関数 (もし実装する場合)
+    /*
+    function updateSelectedCountDisplay() {
+        if (!selectedCountDisplay) return;
+        const selectedCheckboxes = document.querySelectorAll(".task-checkbox:checked");
+        if (selectedCheckboxes.length > 0) {
+            selectedCountDisplay.textContent = `${selectedCheckboxes.length}件のタスクを選択中`;
+        } else {
+            selectedCountDisplay.textContent = '';
+        }
+    }
+    */
+
     if (selectButton) {
         selectButton.addEventListener("click", function () {
             const taskCheckboxes = document.querySelectorAll(".task-checkbox");
-            
             let isCurrentlySelecting = selectButton.dataset.selecting === 'true';
 
-            
-            isCurrentlySelecting = !isCurrentlySelecting;
+            isCurrentlySelecting = !isCurrentlySelecting; // 状態をトグル
             selectButton.dataset.selecting = isCurrentlySelecting;
 
-            if (isCurrentlySelecting) {
+            if (isCurrentlySelecting) { // これから選択モードになる
                 selectButton.textContent = '選択解除';
-                if (allCheckbox) allCheckbox.style.display = 'inline-block';
-                if (allCheckboxLabel) allCheckboxLabel.style.display = 'inline-block'; 
+                if (allCheckboxLabelContainer) allCheckboxLabelContainer.style.display = 'inline-flex'; // 表示スタイル変更
                 if (deleteSelectedButton) deleteSelectedButton.style.display = 'inline-block';
                 taskCheckboxes.forEach((checkbox) => {
-                    checkbox.style.display = 'inline-block';
+                    checkbox.style.display = 'inline-block'; // 標準チェックボックスの表示（カスタム化する場合は変更）
                 });
-            } else { 
+            } else { // これから選択モードを解除する
                 selectButton.textContent = '選択';
+                if (allCheckboxLabelContainer) allCheckboxLabelContainer.style.display = 'none';
                 if (allCheckbox) {
-                    allCheckbox.style.display = 'none';
-                    allCheckbox.checked = false; 
+                    allCheckbox.checked = false;
+                    allCheckbox.indeterminate = false; // 中間状態もリセット
                 }
-                if (allCheckboxLabel) allCheckboxLabel.style.display = 'none'; 
                 if (deleteSelectedButton) deleteSelectedButton.style.display = 'none';
                 taskCheckboxes.forEach((checkbox) => {
                     checkbox.style.display = 'none';
                     checkbox.checked = false;
                 });
             }
+            updateSelectAllCheckboxVisualState(); // 選択モード切替時にも「すべて選択」の状態を更新
+            // updateSelectedCountDisplay(); // 選択件数表示も更新 (もし実装する場合)
         });
     }
 
@@ -46,8 +83,20 @@ document.addEventListener("DOMContentLoaded", function () {
             taskCheckboxes.forEach((checkbox) => {
                 checkbox.checked = allCheckbox.checked;
             });
+            // allCheckbox.indeterminate = false; // 自身がクリックされたら中間状態は解除
+            updateSelectAllCheckboxVisualState(); // 他のチェックボックスの状態と整合性を取るため再評価
+            // updateSelectedCountDisplay(); // 選択件数表示も更新 (もし実装する場合)
         });
     }
+
+    // 各タスクのチェックボックスが変更されたときにも「すべて選択」の状態を更新
+    document.querySelectorAll(".task-checkbox").forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            updateSelectAllCheckboxVisualState();
+            // updateSelectedCountDisplay(); // 選択件数表示も更新 (もし実装する場合)
+        });
+    });
+
 
     if (deleteSelectedButton && bulkDeleteForm) {
         deleteSelectedButton.addEventListener("click", function () {
@@ -76,4 +125,8 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     }
+
+    // 初期読み込み時にも「すべて選択」の状態を（もし表示されていれば）確認
+    // ただし、初期は非表示なので、選択ボタンクリック時に updateSelectAllCheckboxVisualState を呼ぶ方が適切
+    // updateSelectAllCheckboxVisualState();
 });

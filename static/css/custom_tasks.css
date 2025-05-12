@@ -257,3 +257,191 @@ ul.completed-task-list-ul li {
         margin: 10px auto; /* 上下にもマージン、左右はautoで中央 */
     }
 }
+
+.deleted-tasks-action-bar {
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.deleted-tasks-action-bar > * {
+    margin-right: 10px;
+    margin-bottom: 5px;
+}
+
+.deleted-tasks-action-bar > *:last-child {
+    margin-right: 0;
+}
+
+.deleted-tasks-action-bar label {
+    margin-left: -5px;
+    cursor: pointer;
+}
+
+ul.deleted-task-list {
+    list-style-type: none;
+    padding-left: 0;
+    margin-top: 10px;
+}
+
+ul.deleted-task-list li {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 12px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+ul.deleted-task-list li .task-main-content {
+    flex-grow: 1;
+    display: flex;
+    align-items: flex-start;
+}
+
+ul.deleted-task-list li .task-main-content input[type="checkbox"].task-checkbox {
+    margin-right: 12px;
+    margin-top: 5px;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+/*確認必要*/
+ul.deleted-task-list li .task-text-details {
+    flex-grow: 1;
+    margin-left: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+ul.deleted-task-list li .task-text-details del.task-title-text{
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #a94442;
+    display: block;
+    margin-bottom: 5px;
+}
+
+ul.deleted-task-list li .task-actions-container {
+    display: flex;
+    align-items: center;
+    margin-left: 15px;
+    flex-shrink: 0;
+}
+
+.button-delete-all {
+    background-color: #d9534f;
+}
+.button-delete-all:hover {
+    background-color: #c9302c;
+}
+.button-restore{
+    background-color: #5cb0de;
+}
+.button-restore-all:hover {
+    background-color: #31b0d5;
+}
+
+.button{
+    display: inline-block;
+    border: 1px solid transparent;
+    padding: 7px 12px;
+    border-radius: 4px;
+    color: #333;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    font-size: 0.85em;
+    font-weight: bold;
+    transition: background-color 0.2s ease-in-out,border-color 0.2s ease-in-out;
+    margin-left: 8px;
+}
+
+.button:first-child {
+    margin-left: 0;
+}
+
+.button-action {
+    background-color: #5bc0de;
+    color: white;
+    border-color: #269abc;
+}
+
+.button-action:hover {
+    background-color: #31b0d5;
+    border-color: #269abc;
+}
+
+.button-secondary {
+    background-color: #f0f0f0;
+    color: #333;
+    border: 1px solid #ccc;
+}
+
+.button-secondary:hover {
+    background-color: #d9d9d9;
+    border-color: #bbb;
+}
+
+.custom-checkbox-container {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    margin-right: 10px;
+    font-size: 0.9em;
+    color: #495057;
+    user-select: none;
+}
+
+.custom-checkbox-container input[type="checkbox"] {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+}
+
+.custom-checkbox-checkmark {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    background-color: #fff;
+    border: 1px solid #abd5bd;
+    border-radius: 3px;
+    margin-right: 8px;
+    position: relative;
+    transition: background-color 0.15s ease-in-out,border-color 0.15s ease-in-out;
+}
+
+.custom-checkbox-container input[type="checkbox"]:checked + .custom-checkbox-checkmark {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.custom-checkbox-checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+    left: 6px;
+    top: 2px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.custom-checkbox-container input[type="checkbox"]:checked + .custom-checkbox-checkmark:after {
+    display: block;
+}
+
+.custom-checkbox-container .custom-checkbox-label {
+    font-size: 0.9em;
+    color: #495057;
+}

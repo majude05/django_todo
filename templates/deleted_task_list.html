@@ -3,57 +3,81 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="{% static 'css/deleted_tasks.css' %}">
     <title>削除済みタスク一覧</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/custom_tasks.css' %}">
+    <link rel="stylesheet" href="{% static 'css/deleted_tasks.css' %}">
 </head>
 <body>
-    <h1>削除済みタスク一覧</h1>
+    <div class="container">
+        <h1>削除済みタスク一覧</h1>
 
-    <div>
-        <button id = "select-tasks" data-selecting="false">選択</button>
-        <input type="checkbox" id="select-all" style="display: none;"> 
-        <label for="select-all" id="select-all-label" style="display: none;">すべて選択</label> 
-        <button id="delete-selected" style="display: none; color: red; font-weight: bold;">選択したタスクを完全に削除</button> 
+        <div class="deleted-tasks-actions-bar">
+            <button id="select-tasks" class="button button-action" data-selecting="false">選択</button>
+
+            {# ↓↓↓ 「すべて選択」チェックボックスとラベルの変更箇所 ↓↓↓ #}
+            <label class="custom-checkbox-container" for="select-all" id="select-all-label-container" style="display: none;">
+                <input type="checkbox" id="select-all">
+                <span class="custom-checkbox-checkmark"></span>
+                <span class="custom-checkbox-label-text">すべて選択</span>
+            </label>
+            {# ↑↑↑ ここまで変更 ↑↑↑ #}
+
+            <button id="delete-selected" class="button button-delete" style="display: none;">選択したタスクを完全に削除</button>
+
+            <form id="delete-all-form" method="post" action="{% url 'delete_all_tasks' %}" style="display: inline-block; margin-left: auto;">
+                {% csrf_token %}
+                <button type="button" id="delete-all" class="button button-delete-all">すべてのタスクを完全に削除</button>
+            </form>
+        </div>
+
         <form id="bulk-delete-form" method="post" action="{% url 'bulk_delete_tasks' %}" style="display: none;">
             {% csrf_token %}
             <input type="hidden" name="task_ids" id="task-ids">
         </form>
 
-        
-        <!---
-        <form id="delete-all-form" method="post" action="{% url 'delete_all_tasks' %}" style="display: inline-block;">
-            {% csrf_token %}
-            <button type="submit" id="delete-all" style="color: red;">すべてのタスクを完全に削除</button>
-        </form>
-    -->
+        <ul class="deleted-task-list">
+            {% for task in deleted_tasks %}
+                <li>
+                    <div class="task-main-content">
+                        {# ↓↓↓ 各タスクのチェックボックスもカスタムスタイルを適用する場合 (今回は「すべて選択」のみが対象) ↓↓↓ #}
+                        {# もし各タスクのチェックボックスも同様にカスタムしたい場合は、ここも label と span で囲む構造に変更します #}
+                        <input type="checkbox" class="task-checkbox" value="{{ task.id }}" style="display: none;">
+                        {# ↑↑↑ 現状はJavaScriptで表示/非表示を制御しているので、このまま標準チェックボックスでも可 #}
 
-    
+                        <div class="task-text-details">
+                            <del class="task-title-text">{{ task.title }}</del>
+                            {% if task.deleted_at %}
+                                <small class="task-due-date">削除日時：{{ task.deleted_at|date:"Y-m-d H:i" }}</small>
+                            {% endif %}
+                            {% if task.description %}
+                                <p class="task-description">{{ task.description }}</p>
+                            {% endif %}
+                            {% if task.tags.all %}
+                                <div class="task-tags-container">
+                                    {% for tag_item_inner in task.tags.all %}
+                                        <span class="task-tag">{{ tag_item_inner.name }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="task-actions-container">
+                        <form method="post" action="{% url 'restore_task' task.id %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="button button-restore">復元</button>
+                        </form>
+                    </div>
+                </li>
+            {% empty %}
+                <li>削除済みのタスクはありません。</li>
+            {% endfor %}
+        </ul>
 
+        <div class="page-actions">
+            <a href="{% url 'task_list' %}">タスク一覧に戻る</a>
+        </div>
     </div>
-
-    <br>
-
-    <ul class = "deleted-task-list">
-        {% for task in deleted_tasks %}
-            <li>
-                <input type="checkbox" class="task-checkbox" value="{{ task.id }}" style="display: none;">
-                <del>{{ task.title }}</del>
-                {% if task.due_date %}
-                    <small>削除日時：{{ task.deleted_at|date:"Y-m-d H:i" }}</small>
-                {% endif %}
-                {% if task.description %}
-                    <p>{{ task.description }}</p>
-                {% endif %}
-                <form method="post" action="{% url 'restore_task' task.id %}" style="display: inline;">
-                    {% csrf_token %}
-                    <button type="submit">復元</button>
-                </form>
-            </li>
-        {% empty %}
-            <li>削除済みのタスクはありません。</li>
-        {% endfor %}
-    </ul>
-    <a href="{% url 'task_list' %}">タスク一覧に戻る</a>
 
     <script src="{% static 'js/deleted_tasks.js' %}"></script>
 </body>
