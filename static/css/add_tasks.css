@@ -1,0 +1,81 @@
+.form-container {
+    margin-top: 20px;
+
+}
+.form-field {
+    margin-bottom: 20px;
+}
+
+.form-field label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #34495e;
+}
+
+.form-field input[type="text"],
+.form-field input[type="datetime-local"],
+.form-field textarea,
+.form-field select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #bdc3c7;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 1em;
+}
+.form-field input[type="text"]:focus,
+.form-field input[type="datetime-local"]:focus,
+.form-field textarea:focus,
+.form-field select:focus {
+    border-color: #3498db;
+    outline: none;
+    box-shadow: 0 0 2px rgba(52, 152, 219, 0.25);
+}
+
+.form-field textarea {
+    height: 100px;
+    resize: vertical;
+}
+.form-field select[multiple] {
+    min-height: 120px;
+}
+
+.form-field .errorlist {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 5px;
+    color: #e74c3c;
+    font-size: 0.9em;
+}
+
+.form-actions {
+    margin-top: 30px;
+    text-align: right;
+}
+
+.button {
+    display: inline-block;
+    padding: 8px 15px;
+    border: none;
+    background-origin: 4px;
+    color: white;
+    text-decoration: none;
+    text-align: center;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.32s ease-in-out;
+}
+.button-primary {
+    background-color: #2ecc71;
+}
+.button-primary:hover {
+    background-color: #27ae60;
+}
+.button-secondary {
+    background-color: #95a6a6;
+    margin-right: 10px;
+}
+.button-secondary:hover {
+    background-color: #7f8c8d;
+}

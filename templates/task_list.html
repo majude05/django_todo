@@ -1,88 +1,104 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
     <title>タスク一覧</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> {# レスポンシブ対応のためビューポート設定 #}
+    <link rel ="stylesheet" href="{% static 'css/custom_tasks.css' %}">
 </head>
 <body>
-    <h1>タスク一覧</h1>
+    <div class="container"> {# 全体をコンテナで囲む #}
+        <h1>タスク一覧</h1>
 
-    <div>
-    <strong>タグで絞り込む</strong>
-    <a href="{% url 'task_list' %}" {% if not current_tag %}style="font-weight: bold;"{% endif %}>すべて</a>
-    {% for tag in tags %}
-        <a href="{% url 'task_list_by_tag' tag.name %}" {% if current_tag == tag.name %}style="font-weight: bold;"{% endif %}>{{ tag.name }}</a>
-    {% endfor %}
-</div>
+        <div class="tag-filter">
+            <strong>タグで絞り込む:</strong>
+            <a href="{% url 'task_list' %}" {% if not current_tag %}class="active-tag"{% endif %}>すべて</a>
+            {% for tag_item in tags %}
+                <a href="{% url 'task_list_by_tag' tag_item.name %}" {% if current_tag == tag_item.name %}class="active-tag"{% endif %}>{{ tag_item.name }}</a>
+            {% endfor %}
+        </div>
 
-    <ul>
-        {% for task in incomplete_tasks %}
-            <li>
-                <form method="post" action="{% url 'toggle_task' task.id %}">
-                    {% csrf_token %}
-                    <input type="checkbox" name="is_completed" {% if task.is_completed %}checked{% endif %} onchange="this.form.submit()">
-                    {{ task.title }}
-                    {% if task.due_date %}
-                        <small>締め切り：{{ task.due_date|date:"Y-m-d H:i" }}</small>
-                    {% endif %}
-                    {% if task.description %}
-                        <p>{{ task.description }}</p>
-                    {% endif %}
-                    {% if task.tags.all %}
-                        <div style="display: inline;">
-                            {% for tag in task.tags.all %}
-                                <span style="background-color: lightgray; padding: 2px 5px; border-radius: 5px; margin-right: 5px;">{{ tag.name }}</span>
-                            {% endfor %}
+        <ul class="task-list-ul">
+            {% for task in incomplete_tasks %}
+                <li>
+                    <div class="task-main-content">
+                        <form method="post" action="{% url 'toggle_task' task.id %}" class="task-toggle-form">
+                            {% csrf_token %}
+                            <input type="checkbox" name="is_completed" {% if task.is_completed %}checked{% endif %} onchange="this.form.submit()">
+                        </form>
+                        <div class="task-text-details">
+                            <span class="task-title-text">{{ task.title }}</span>
+                            {% if task.due_date %}
+                                <small class="task-due-date">締め切り：{{ task.due_date|date:"Y-m-d H:i" }}</small>
+                            {% endif %}
+                            {% if task.description %}
+                                <p class="task-description">{{ task.description }}</p>
+                            {% endif %}
+                            {% if task.tags.all %}
+                                <div class="task-tags-container">
+                                    {% for tag_item_inner in task.tags.all %}
+                                        <span class="task-tag">{{ tag_item_inner.name }}</span>
+                                    {% endfor %}
+                            {% endif %}
                         </div>
-                    {% endif %}
-                </form>
-                <form method="post" action="{% url 'delete_task' task.id %}" style="display: inline;">
-                    {% csrf_token %}
-                    <button type="submit" style="color: red;">削除</button>
-                </form>
-                <a href="{% url 'edit_task' task.id %}">編集</a>
+                    </div>
+                    <div class="task-actions-container">
+                        <form method="post" action="{% url 'delete_task' task.id %}" class="task-delete-form">
+                            {% csrf_token %}
+                            <button type="submit" class="button button-delete">削除</button> {# 共通クラス button を追加 #}
+                        </form>
+                        <a href="{% url 'edit_task' task.id %}" class="button button-edit">編集</a> {# 共通クラス button を追加 #}
+                    </div>
                 </li>
-        {% empty %}
-            <li>まだタスクはありません。</li>
-        {% endfor %}
-    </ul>
+            {% empty %}
+                <li>まだタスクはありません。</li>
+            {% endfor %}
+        </ul>
 
-    <h2>完了済みタスク</h2>
-    <ul>
-        {% for task in completed_tasks %}
-            <li>
-                <form method="post" action="{% url 'toggle_task' task.id %}">
-                    {% csrf_token %}
-                    <input type="checkbox" name="is_completed" {% if task.is_completed %}checked{% endif %} onchange="this.form.submit()">
-                    <del>{{ task.title }}</del>
-                    {{ task.title }}
-                    {% if task.due_date %}
-                        <small>締め切り：{{ task.due_date|date:"Y-m-d H:i" }}</small>
-                    {% endif %}
-                    {% if task.description %}
-                        <p>{{ task.description }}</p>
-                    {% endif %}
-                    {% if task.tags.all %}
-                        <div style="display: inline;">
-                            {% for tag in task.tag.all %}
-                                <span style="background-color: lightgray; padding: 2px 5px; border-radius: 5px; margin-right: 5px;">{{ tag.name }}</span>
-                            {% endfor %}
+        <h2>完了済みタスク</h2>
+        <ul class="completed-task-list-ul">
+            {% for task in completed_tasks %}
+                <li>
+                    <div class="task-main-content">
+                        <form method="post" action="{% url 'toggle_task' task.id %}" class="task-toggle-form">
+                            {% csrf_token %}
+                            <input type="checkbox" name="is_completed" {% if task.is_completed %}checked{% endif %} onchange="this.form.submit()">
+                        </form>
+                        <div class="task-text-details">
+                            <del class="task-title-text">{{ task.title }}</del>
+                            {% if task.due_date %}
+                                <small class="task-due-date">締め切り：{{ task.due_date|date:"Y-m-d H:i" }}</small>
+                            {% endif %}
+                            {% if task.description %}
+                                <p class="task-description">{{ task.description }}</p>
+                            {% endif %}
+                            {% if task.tags.all %}
+                                <div class="task-tags-container">
+                                    {% for tag_item_inner in task.tags.all %}
+                                        <span class="task-tag">{{ tag_item_inner.name }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
                         </div>
-                    {% endif %}
-                </form>
-                <form method="post" action="{% url 'delete_task' task.id %}" style="display: inline;">
-                    {% csrf_token %}
-                    <button type="submit" style="color: red;">削除</button>
-                </form>
-                
-            </li>
-        {% empty %}
-            <li>完了済みのタスクはありません。</li>
-        {% endfor %}
-    </ul>
+                    </div>
+                    <div class="task-actions-container">
+                        <form method="post" action="{% url 'delete_task' task.id %}" class="task-delete-form">
+                            {% csrf_token %}
+                            <button type="submit" class="button button-delete">削除</button> {# 共通クラス button を追加 #}
+                        </form>
+                        {# <a href="{% url 'edit_task' task.id %}" class="button button-edit">編集</a> #}
+                    </div>
+                </li>
+            {% empty %}
+                <li>完了済みのタスクはありません。</li>
+            {% endfor %}
+        </ul>
 
-    <a href="{% url 'add_task' %}">新しいタスクを追加</a>
-    <br>
-    <a href="{% url 'deleted_task_list' %}">削除済みタスク一覧</a>
+        <div class="page-actions"> {# ページ下部のアクションリンクをまとめる #}
+            <a href="{% url 'add_task' %}">新しいタスクを追加</a>
+            <a href="{% url 'deleted_task_list' %}">削除済みタスク一覧</a>
+        </div>
+    </div> {# container の閉じタグ #}
 </body>
 </html>
