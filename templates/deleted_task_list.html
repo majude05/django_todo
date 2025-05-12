@@ -15,13 +15,14 @@
         <div class="deleted-tasks-actions-bar">
             <button id="select-tasks" class="button button-action" data-selecting="false">選択</button>
 
-            {# ↓↓↓ 「すべて選択」チェックボックスとラベルの変更箇所 ↓↓↓ #}
             <label class="custom-checkbox-container" for="select-all" id="select-all-label-container" style="display: none;">
                 <input type="checkbox" id="select-all">
                 <span class="custom-checkbox-checkmark"></span>
                 <span class="custom-checkbox-label-text">すべて選択</span>
             </label>
-            {# ↑↑↑ ここまで変更 ↑↑↑ #}
+
+            <span id="selected-count-display" style= "display: none;margin-left: 10px;font-size: 0.9em; color: #555;"></span>
+            
 
             <button id="delete-selected" class="button button-delete" style="display: none;">選択したタスクを完全に削除</button>
 

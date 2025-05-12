@@ -445,3 +445,10 @@ ul.deleted-task-list li .task-actions-container {
     font-size: 0.9em;
     color: #495057;
 }
+
+#selected-count-display {
+    margin-left: 10px;
+    font-size: 0.85em;
+    color: #555;
+    
+}
