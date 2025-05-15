@@ -154,40 +154,70 @@ ul.completed-task-list-ul li {
 }
 
 /* 共通ボタンスタイル */
+/* 共通ボタンスタイル */
 .button {
     display: inline-block;
-    padding: 7px 12px; /* 少し小さめに調整 */
-    border: none;
+    padding: 8px 15px; /* フォームボタンと共通のpaddingに (例) */
+    border: 1px solid transparent; /* 基本は透明ボーダー */
     border-radius: 4px;
-    color: white;
+    color: white; /* 基本の文字色は白 */
     text-decoration: none;
     text-align: center;
     cursor: pointer;
-    font-size: 0.85em; /* 少し小さめに調整 */
-    transition: background-color 0.2s ease-in-out;
-    margin-left: 8px; /* ボタン間のマージン */
+    font-size: 0.9em; /* フォームボタンと共通のフォントサイズに (例) */
+    font-weight: bold; /* ボタンテキストを太字に (任意) */
+    transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+    margin-left: 8px;
 }
-.task-actions-container .button:first-child { /* コンテナ内の最初のボタンの左マージンは不要 */
+.button:first-child { /* 同一コンテナ内の最初のボタンの左マージンは不要 */
     margin-left: 0;
 }
 
+/* プライマリボタン (緑系: 登録、追加、OKなど) */
+.button.button-primary { /* .button と .button-primary 両方のクラスを持つ要素に適用 */
+    background-color: #2ecc71; /* タスク追加画面の「新しいタスクを追加」ボタンの色に合わせる */
+    border-color: #2ecc71;
+    color: white;
+}
+.button.button-primary:hover {
+    background-color: #27ae60;
+    border-color: #27ae60;
+}
 
-.button-delete {
-    background-color: #e74c3c; /* 赤系 */
-    color: white !important;
+/* セカンダリボタン (グレー系: キャンセルなど) */
+.button.button-secondary {
+    background-color: #f0f0f0; /* 既存のセカンダリボタンの色 */
+    color: #333;             /* 文字色を濃いグレーに */
+    border-color: #ccc;       /* 境界線を追加 */
 }
-.button-delete:hover {
-    background-color: #c0392b;
+.button.button-secondary:hover {
+    background-color: #d9d9d9;
+    border-color: #bbb;
 }
 
-.button-edit {
-    background-color: #3498db; /* 青系 */
-    color: white !important;
+/* 編集ボタン (青系) - 既存の定義を活用 */
+.button.button-edit { /* .button と .button-edit 両方のクラスを持つ要素に適用 */
+    background-color: #3498db;
+    /* color: white !important; は .button で指定されていれば不要なはず */
+    color: white; /* 明示的に指定 */
+    border-color: #3498db;
 }
-.button-edit:hover {
+.button.button-edit:hover {
     background-color: #2980b9;
+    border-color: #2980b9;
 }
 
+/* 削除ボタン (赤系) - 既存の定義を活用 */
+.button.button-delete { /* .button と .button-delete 両方のクラスを持つ要素に適用 */
+    background-color: #e74c3c;
+    /* color: white !important; は .button で指定されていれば不要なはず */
+    color: white; /* 明示的に指定 */
+    border-color: #e74c3c;
+}
+.button.button-delete:hover {
+    background-color: #c0392b;
+    border-color: #c0392b;
+}
 /* --- ページ下部のリンクセクション --- */
 .page-actions {
     margin-top: 30px;

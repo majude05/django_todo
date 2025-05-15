@@ -26,10 +26,11 @@
 
             <button id="delete-selected" class="button button-delete" style="display: none;">選択したタスクを完全に削除</button>
 
+            <!--
             <form id="delete-all-form" method="post" action="{% url 'delete_all_tasks' %}" style="display: inline-block; margin-left: auto;">
                 {% csrf_token %}
                 <button type="button" id="delete-all" class="button button-delete-all">すべてのタスクを完全に削除</button>
-            </form>
+            </form>-->
         </div>
 
         <form id="bulk-delete-form" method="post" action="{% url 'bulk_delete_tasks' %}" style="display: none;">
@@ -41,11 +42,9 @@
             {% for task in deleted_tasks %}
                 <li>
                     <div class="task-main-content">
-                        {# ↓↓↓ 各タスクのチェックボックスもカスタムスタイルを適用する場合 (今回は「すべて選択」のみが対象) ↓↓↓ #}
-                        {# もし各タスクのチェックボックスも同様にカスタムしたい場合は、ここも label と span で囲む構造に変更します #}
+                        
                         <input type="checkbox" class="task-checkbox" value="{{ task.id }}" style="display: none;">
-                        {# ↑↑↑ 現状はJavaScriptで表示/非表示を制御しているので、このまま標準チェックボックスでも可 #}
-
+                        
                         <div class="task-text-details">
                             <del class="task-title-text">{{ task.title }}</del>
                             {% if task.deleted_at %}

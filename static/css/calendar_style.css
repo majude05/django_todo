@@ -150,3 +150,16 @@
     text-align: right;
     margin-top: 20px;
 }
+
+.fc-daygrid-day-frame {
+    transition: background-color 0.2s ease-in-out;
+}
+
+.fc-daygrid-day-frame:hover {
+    background-color: #e9ecef;
+    cursor: pointer;
+}
+
+.fc-day-today .fc-daygrid-day-frame:hover{
+    background-color: #ddeeff;
+}
