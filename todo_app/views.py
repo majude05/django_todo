@@ -5,6 +5,7 @@ from django.utils import timezone
 import json
 from django.http import JsonResponse
 from django.urls import reverse
+from datetime import datetime
 
 # Create your views here.
 def task_list(request, tag_name=None):
@@ -38,6 +39,16 @@ def task_list(request, tag_name=None):
     return render(request, 'task_list.html', context)
 
 def add_task(request):
+    initial_data = {}
+    if request.method == 'GET':
+        due_date_str = request.GET.get('due_date')
+        if due_date_str:
+            try:
+                dt_object = datetime.strptime(due_date_str, '%Y-%m-%d')
+                initial_data['due_date'] = dt_object
+            except ValueError:
+                pass
+
     if request.method == 'POST':
         form = TaskForm(request.POST)
         if form.is_valid():
@@ -48,10 +59,12 @@ def add_task(request):
                 end_date=form.cleaned_data['end_date'],
             )
             task.save()
-            task.tags.set(form.cleaned_data['tags'])
+            tags = form.cleaned_data['tags']
+            if tags:
+                task.tags.set(tags)
             return redirect('task_list')
     else:
-        form = TaskForm()
+        form = TaskForm(initial=initial_data)
     return render(request, 'add_task.html', {'form': form})
 
 def toggle_task(request, task_id):
