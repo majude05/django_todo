@@ -3,6 +3,8 @@ from .models import Task, Tag
 from .forms import TaskForm
 from django.utils import timezone
 import json
+from django.http import JsonResponse
+from django.urls import reverse
 
 # Create your views here.
 def task_list(request, tag_name=None):
@@ -115,3 +117,35 @@ def bulk_delete_tasks(request):
             task_ids = json.loads(task_ids_json)
             Task.objects.filter(id__in=task_ids, is_deleted=True).delete()
     return redirect('deleted_task_list')
+
+def task_events_api(request):
+    tasks = Task.objects.filter(is_deleted=False, due_date__isnull=False)
+    events = []
+
+    for task in tasks:
+        event_color = '#808080'
+        if task.tags.exists():
+            first_tag = task.tags.first()
+            if first_tag and first_tag.color:
+                event_color = first_tag.color
+
+        event_data = {
+            'id': task.id,
+            'title': task.title,
+            'start': task.due_date.isoformat() if task.due_date else None,
+            #'end': task.end_date.isoformat() if task.end_date else None,
+            'backgroundColor': event_color,
+            'borderColor': event_color,
+            'textColor': '#FFFFFF',
+            #'url': reverse('edit_task', args=[task.id]),
+            'extendedProps': {
+                'description': task.description or '',
+                'start_time': task.due_date.strftime('%H:%M') if task.due_date else '',
+                #'end_time': '',
+                'tags': [tag.name for tag in task.tags.all()]
+            }
+        }
+        if event_data['start']:
+                events.append(event_data)
+                
+    return JsonResponse(events, safe=False)

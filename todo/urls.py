@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from todo_app.views import task_list, add_task,toggle_task, deleted_task_list, delete_task, edit_task, restore_task, delete_all_tasks, bulk_delete_tasks
+from todo_app.views import task_list, add_task,toggle_task, deleted_task_list, delete_task, edit_task, restore_task, delete_all_tasks, bulk_delete_tasks, task_events_api
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -30,4 +30,5 @@ urlpatterns = [
     path('restore/<int:task_id>/', restore_task, name='restore_task'),
     path('delete_all/', delete_all_tasks, name='delete_all_tasks'),
     path('bulk_delete/', bulk_delete_tasks, name='bulk_delete_tasks'),
+    path('api/task_events/', task_events_api, name='task_events_api'),
 ]

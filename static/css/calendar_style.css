@@ -90,4 +90,63 @@
     text-decoration: underline;
 }
 
-/* 必要に応じて、さらに細かい部分のスタイルを開発者ツールで確認しながら追加・調整します */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding-top: 60px;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 25px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px;
+    border-radius: 8px;
+    box-shadow: 0 15px 15px rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+
+.modal-close-button {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.modal-close-button:hover,
+.modal-close-button:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    color:#333;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.modal-content p {
+    margin-bottom: 10px;
+    line-height: 1.6;
+}
+
+.modal-content p strong {
+    color: #555;
+}
+
+.modal-actions {
+    text-align: right;
+    margin-top: 20px;
+}

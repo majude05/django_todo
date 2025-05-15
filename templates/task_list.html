@@ -6,9 +6,11 @@
     <title>タスク一覧</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel ="stylesheet" href="{% static 'css/custom_tasks.css' %}">
+    <link rel="stylesheet" href="{% static 'css/calendar_style.css' %}">
 </head>
 <body>
-    <div class="container">
+    <h1>カレンダー</h1>
+    <div id = 'calendar'></div>
         <h1>タスク一覧</h1>
 
         <div class="tag-filter">
@@ -46,11 +48,11 @@
                         </div>
                     </div>
                     <div class="task-actions-container">
+                        <a href="{% url 'edit_task' task.id %}" class="button button-edit">編集</a>
                         <form method="post" action="{% url 'delete_task' task.id %}" class="task-delete-form">
                             {% csrf_token %}
                             <button type="submit" class="button button-delete">削除</button>
                         </form>
-                        <a href="{% url 'edit_task' task.id %}" class="button button-edit">編集</a>
                     </div>
                 </li>
             {% empty %}
@@ -102,5 +104,25 @@
             <a href="{% url 'deleted_task_list' %}" class="button">削除済みタスク一覧</a>
         </div>
     </div>
+
+    <div id = "taskDetailModal" class = "modal">
+        <div class ="modal-content">
+            <span class = "modal-close-button">&times;</span>
+            <h3 id = "modalTaskTitle">タスク詳細</h3>
+            <hr>
+            <p><strong>開始日時:</strong><span id = "modalTaskStart"></span></p>
+            <!--<p><strong>終了日時:</strong><span id = "modalTaskEnd"></span></p>-->
+            <p><strong>詳細</strong></p>
+            <p id ="modalTaskDescription" style = "white-space: pre-wrap;"></p>
+            <p><strong>タグ:</strong><span id = "modalTaskTags"></span></p>
+            <div class = "modal-actions">
+                <a href="#"" id="modalEditTaskLink" class="button button-edit">編集する</a>
+            </div>
+        </div>
+    </div>
+
+    <script src ="{% static 'fullcalendar-6.1.7/index.global.min.js' %}" defer></script>
+    <script src ="{% static 'fullcalendar-6.1.7/locales-all.global.min.js' %}" defer></script>
+    <script src ="{% static 'js/calendar_style.js' %}" defer></script>
 </body>
 </html>
