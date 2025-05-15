@@ -1,0 +1,93 @@
+/* static/css/calendar_style.css */
+
+/* カレンダー全体を囲むコンテナのスタイル */
+#calendar-container {
+    margin-top: 20px; /* 上の要素（タスク一覧のタイトルなど）との間隔 */
+    margin-bottom: 30px; /* 下の要素（タグフィルターなど）との間隔 */
+    padding: 20px; /* 内側の余白 */
+    background-color: #ffffff; /* 背景色を白に（コンテナが目立つように） */
+    border: 1px solid #e0e0e0; /* やや薄い境界線 */
+    border-radius: 8px; /* 角を少し丸くする */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* 控えめな影 */
+}
+
+/* FullCalendar本体を描画するdivのスタイル */
+#calendar {
+    max-width: 100%; /* 親要素の幅に合わせる */
+    margin: 0 auto;  /* 中央寄せ */
+}
+
+/* --- FullCalendarの見た目を調整するカスタムスタイル（例） --- */
+
+/* ヘッダーツールバーのボタンのスタイルを少し調整 */
+.fc .fc-button { /* FullCalendarが生成するボタンクラス */
+    background-color: #f0f0f0;
+    border-color: #e0e0e0;
+    color: #333;
+    text-transform: none; /* ボタンテキストの大文字化を解除（もしされていれば） */
+    box-shadow: none; /* デフォルトの影を消す */
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+.fc .fc-button:hover {
+    background-color: #dcdcdc;
+    border-color: #c0c0c0;
+}
+.fc .fc-button-primary { /* Todayボタンなど */
+    background-color: #007bff;
+    border-color: #007bff;
+    color: white;
+}
+.fc .fc-button-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+.fc .fc-button-primary:disabled { /* 無効化されたボタン */
+    background-color: #c0c0c0;
+    border-color: #c0c0c0;
+}
+
+
+/* カレンダーのタイトル（例: "2025年5月"）のスタイル */
+.fc .fc-toolbar-title {
+    font-size: 1.5em; /* 少し大きく */
+    color: #2c3e50;   /* 見出しと色を合わせる */
+}
+
+/* イベント（タスク）のデフォルトスタイルを少し調整 */
+.fc-event {
+    border-radius: 3px;
+    font-size: 0.85em;
+    cursor: pointer; /* クリック可能であることを示す */
+    transition: opacity 0.2s ease;
+}
+.fc-event:hover {
+    opacity: 0.85; /* ホバー時に少し透明にする */
+}
+
+/* 日付セルのスタイル（任意） 
+.fc .fc-daygrid-day-frame { /* 日付セル全体を囲むフレーム */
+    /* border-right: 1px solid #f0f0f0; */ /* 縦の区切り線 (もし必要なら) */
+    /* border-bottom: 1px solid #f0f0f0; */ /* 横の区切り線 (もし必要なら) */
+/* } */
+
+.fc .fc-daygrid-day-top { /* 日付番号のエリア */
+    text-align: left; /* 日付番号を左寄せに */
+    padding: 4px;
+}
+.fc .fc-day-today { /* 今日の日付の背景色 */
+    background-color: #fff9e6 !important; /* !important でFullCalendarのデフォルトを上書き */
+}
+
+/* listWeek ビューのスタイル調整（もし使う場合） */
+.fc-list-event-dot { /* リストビューのイベントマーカー */
+    border-color: #007bff; /* イベントの色に合わせるなど */
+}
+.fc-list-event-title a { /* リストビューのイベントタイトル */
+    color: #007bff;
+    text-decoration: none;
+}
+.fc-list-event-title a:hover {
+    text-decoration: underline;
+}
+
+/* 必要に応じて、さらに細かい部分のスタイルを開発者ツールで確認しながら追加・調整します */
