@@ -4,14 +4,14 @@ document.addEventListener('DOMContentLoaded', function() {
     var calendarEl = document.getElementById('calendar');
 
     // --- モーダル関連の要素を取得 ---
-    const modal = document.getElementById('taskDetailModal');
-    const modalCloseButton = document.querySelector('.modal-close-button');
-    const modalTaskTitle = document.getElementById('modalTaskTitle');
-    const modalTaskStart = document.getElementById('modalTaskStart');
-    // const modalTaskEnd = document.getElementById('modalTaskEnd'); // end_dateがないためコメントアウト
-    const modalTaskDescription = document.getElementById('modalTaskDescription');
-    const modalTaskTags = document.getElementById('modalTaskTags');
-    const modalEditTaskLink = document.getElementById('modalEditTaskLink');
+    const modal = document.getElementById('taskDetailModal'); // HTMLのIDと一致しているか再確認
+    const modalCloseButton = modal ? modal.querySelector('.modal-close-button') : null;
+    const modalTaskTitle = modal ? modal.querySelector('#modalTaskTitle') : null;
+    const modalTaskStart = modal ? modal.querySelector('#modalTaskStart') : null;
+    const modalTaskEnd = modal ? modal.querySelector('#modalTaskEnd') : null;
+    const modalTaskDescription = modal ? modal.querySelector('#modalTaskDescription') : null;
+    const modalTaskTags = modal ? modal.querySelector('#modalTaskTags') : null;
+    const modalEditTaskLink = modal ? modal.querySelector('#modalEditTaskLink') : null;
 
     // --- モーダルを閉じる処理 ---
     if (modalCloseButton) {
@@ -19,7 +19,6 @@ document.addEventListener('DOMContentLoaded', function() {
             if (modal) modal.style.display = "none";
         }
     }
-    // モーダル背景クリックで閉じる (任意)
     if (modal) {
         window.onclick = function(event) {
             if (event.target == modal) {
@@ -27,7 +26,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     }
-
 
     if (calendarEl) {
         var calendar = new FullCalendar.Calendar(calendarEl, {
@@ -48,32 +46,35 @@ document.addEventListener('DOMContentLoaded', function() {
             eventClick: function(info) {
                 info.jsEvent.preventDefault();
 
-                // extendedPropsから詳細情報を取得
                 const title = info.event.title;
-                const start = info.event.start ? info.event.start.toLocaleString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '未設定';
-                // const end = info.event.end ? info.event.end.toLocaleString('ja-JP') : '未設定';
+                const startDateTime = info.event.start; // Dateオブジェクトを取得
+                const endDateTime = info.event.end;     // Dateオブジェクトを取得
+
+                const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+
+                const start = startDateTime ? startDateTime.toLocaleString('ja-JP', options) : '未設定';
+                const end = endDateTime ? endDateTime.toLocaleString('ja-JP', options) : '未設定'; // ★修正点: options を適用★
+
                 const description = info.event.extendedProps.description || 'なし';
                 const tags = info.event.extendedProps.tags.join(', ') || 'なし';
-                const taskId = info.event.id; // APIから渡されるタスクID
+                // const taskId = info.event.id; // taskId を使う場合は宣言する
 
-                // モーダルに情報をセット
+                const editUrl = info.event.extendedProps.edit_url; // APIから渡された編集用URL
+
                 if (modalTaskTitle) modalTaskTitle.textContent = title;
                 if (modalTaskStart) modalTaskStart.textContent = start;
-                // if (modalTaskEnd) modalTaskEnd.textContent = end;
+                if (modalTaskEnd) modalTaskEnd.textContent = end; // ★修正されたend文字列をセット★
                 if (modalTaskDescription) modalTaskDescription.textContent = description;
                 if (modalTaskTags) modalTaskTags.textContent = tags;
 
-                // 編集ボタンのリンク先を設定 (DjangoのURLリバースはJavaScriptでは直接使えないので、ベースURLを組み立てる)
-                if (modalEditTaskLink && taskId) {
-                    // 注意: このURLはプロジェクトのURL構造に依存します。
-                    // settings.pyの 'todo_app.views.edit_task' の name が 'edit_task' の場合
-                    modalEditTaskLink.href = `/edit/${taskId}/`; // 実際のURL構造に合わせてください
+                if (modalEditTaskLink && editUrl) {
+                    modalEditTaskLink.href = editUrl;
+                    modalEditTaskLink.style.display = 'inline-block';
+                } else if (modalEditTaskLink) {
+                    modalEditTaskLink.style.display = 'none';
                 }
 
-
-                // モーダルを表示
                 if (modal) modal.style.display = "block";
-
             },
             loading: function(isLoading) {
                 // (変更なし)

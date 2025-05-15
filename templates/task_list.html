@@ -11,6 +11,7 @@
 <body>
     <h1>カレンダー</h1>
     <div id = 'calendar'></div>
+
         <h1>タスク一覧</h1>
 
         <div class="tag-filter">
@@ -33,7 +34,11 @@
                         <div class="task-text-details">
                             <span class="task-title-text">{{ task.title }}</span>
                             {% if task.due_date %}
-                                <small class="task-due-date">締め切り：{{ task.due_date|date:"Y-m-d H:i" }}</small>
+                                <small class="task-due-date">開始：{{ task.due_date|date:"Y-m-d H:i" }}
+                                    {% if task.end_date %}
+                                        ~終了：{{ task.end_date|date:"Y-m-d H:i" }}
+                                    {% endif %}
+                                </small>
                             {% endif %}
                             {% if task.description %}
                                 <p class="task-description">{{ task.description }}</p>
@@ -111,12 +116,12 @@
             <h3 id = "modalTaskTitle">タスク詳細</h3>
             <hr>
             <p><strong>開始日時:</strong><span id = "modalTaskStart"></span></p>
-            <!--<p><strong>終了日時:</strong><span id = "modalTaskEnd"></span></p>-->
+            <p><strong>終了日時:</strong><span id = "modalTaskEnd"></span></p>
             <p><strong>詳細</strong></p>
             <p id ="modalTaskDescription" style = "white-space: pre-wrap;"></p>
             <p><strong>タグ:</strong><span id = "modalTaskTags"></span></p>
             <div class = "modal-actions">
-                <a href="#"" id="modalEditTaskLink" class="button button-edit">編集する</a>
+                <a href="#" id="modalEditTaskLink" class="button button-edit">編集する</a>
             </div>
         </div>
     </div>

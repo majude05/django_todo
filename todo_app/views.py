@@ -44,7 +44,8 @@ def add_task(request):
             task = Task(
                 title=form.cleaned_data['title'],
                 description=form.cleaned_data['description'],
-                due_date=form.cleaned_data['due_date']
+                due_date=form.cleaned_data['due_date'],
+                end_date=form.cleaned_data['end_date'],
             )
             task.save()
             task.tags.set(form.cleaned_data['tags'])
@@ -83,6 +84,7 @@ def edit_task(request, task_id):
             task.title = form.cleaned_data['title']
             task.description = form.cleaned_data['description']
             task.due_date = form.cleaned_data['due_date']
+            task.end_date = form.cleaned_data['end_date']
             task.tags.set(form.cleaned_data['tags'])
             task.save()
             return redirect('task_list')
@@ -91,6 +93,7 @@ def edit_task(request, task_id):
             'title': task.title,
             'description': task.description,
             'due_date': task.due_date.strftime('%Y-%m-%dT%H:%M') if task.due_date else None,
+            'end_date': task.end_date.strftime('%Y-%m-%dT%H:%M') if task.end_date else None,
             'tags': task.tags.all()
         })
     return render(request, 'edit_task.html', {
@@ -133,19 +136,18 @@ def task_events_api(request):
             'id': task.id,
             'title': task.title,
             'start': task.due_date.isoformat() if task.due_date else None,
-            #'end': task.end_date.isoformat() if task.end_date else None,
+            'end': task.end_date.isoformat() if task.end_date else None,
             'backgroundColor': event_color,
             'borderColor': event_color,
             'textColor': '#FFFFFF',
             #'url': reverse('edit_task', args=[task.id]),
             'extendedProps': {
                 'description': task.description or '',
-                'start_time': task.due_date.strftime('%H:%M') if task.due_date else '',
-                #'end_time': '',
-                'tags': [tag.name for tag in task.tags.all()]
+                'tags': [tag.name for tag in task.tags.all()],
+                'edit_url': reverse('edit_task', args=[task.id]),
             }
         }
-        if event_data['start']:
-                events.append(event_data)
+
+        events.append(event_data)
                 
     return JsonResponse(events, safe=False)

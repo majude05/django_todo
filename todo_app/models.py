@@ -8,6 +8,7 @@ class Task(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     is_completed = models.BooleanField(default=False)
     due_date = models.DateTimeField(blank=True, null=True)
+    end_date = models.DateTimeField(blank=True, null=True)
     is_deleted = models.BooleanField(default=False)
     deleted_at = models.DateTimeField(blank=True, null=True)
     tags = models.ManyToManyField('Tag', blank=True)
