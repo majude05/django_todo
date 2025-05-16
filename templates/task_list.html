@@ -1,146 +1,186 @@
+{# todo/templates/task_list.html (修正版) #}
 <!DOCTYPE html>
 {% load static %}
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>タスク一覧</title>
+    <title>カレンダータスク管理</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel ="stylesheet" href="{% static 'css/custom_tasks.css' %}">
+    <link rel="stylesheet" href="{% static 'css/custom_tasks.css' %}">
     <link rel="stylesheet" href="{% static 'css/calendar_style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/layout.css' %}">
 </head>
+
 <body>
-    <h1>カレンダー</h1>
-    <div id = 'calendar'></div>
+    <button id="sidebarToggle" class="sidebar-toggle-button-fixed">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+    </button>
 
-        <h1>タスク一覧</h1>
+    <div class="app-layout">
+        {# === サイドバーメニュー === #}
+        <aside class="sidebar" id="appSidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-header-content">
+                    <h2>メニュー</h2>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="{% url 'add_task' %}" class="button button-primary add-task-button-sidebar">新しいタスクを追加</a>
 
-        <div class="tag-filter">
-            <strong>タグで絞り込む:</strong>
-            <a href="{% url 'task_list' %}" {% if not current_tag %}class="active-tag"{% endif %}>すべて</a>
-            {% for tag_item in tags %} {# ループ変数を tag_item に（前回提案通り） #}
-                <a href="{% url 'task_list_by_tag' tag_item.name %}" {% if current_tag == tag_item.name %}class="active-tag"{% endif %}>{{ tag_item.name }}</a>
-            {% endfor %}
-        </div>
-
-        <h2>未完了のタスク <span class="task-count">({{ incomplete_tasks_count }}件)</span></h2> {# ★件数を表示★ #}
-        <ul class="task-list-ul">
-            {% for task in incomplete_tasks %}
-                <li>
-                    <div class="task-main-content">
-                        <form method="post" action="{% url 'toggle_task' task.id %}" class="task-toggle-form">
-                            {% csrf_token %}
-                            <input type="checkbox" name="is_completed" {% if task.is_completed %}checked{% endif %} onchange="this.form.submit()">
-                        </form>
-                        <div class="task-text-details">
-                            <span class="task-title-text">{{ task.title }}</span>
-                            {% if task.due_date %}
-                                <small class="task-due-date">開始：{{ task.due_date|date:"Y-m-d H:i" }}
-                                    {% if task.end_date %}
-                                        ~終了：{{ task.end_date|date:"Y-m-d H:i" }}
-                                    {% endif %}
-                                </small>
-                            {% endif %}
-                            {% if task.description %}
-                                <p class="task-description">{{ task.description }}</p>
-                            {% endif %}
-                            {% if task.tags.all %}
-                                <div class="task-tags-container">
-                                    {% for tag_item_inner in task.tags.all %} {# ループ変数を tag_item_inner に #}
-                                        <span class="task-tag">{{ tag_item_inner.name }}</span>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
+                <div class="sidebar-section">
+                    <h3>タグで絞り込む</h3>
+                    <div class="tag-filter sidebar-tag-filter">
+                        <a href="{% url 'task_list' %}"
+                            class="tag-filter-button {% if not current_tag %}active-tag-filter{% endif %}"
+                            style="--tag-bg-color: #e9ecef; --tag-text-color: #495057; --tag-border-color: #ced4da;">
+                            すべて
+                        </a>
+                        {% for tag_item in tags %}
+                            <a href="{% url 'task_list_by_tag' tag_item.name %}"
+                                class="tag-filter-button {% if current_tag == tag_item.name %}active-tag-filter{% endif %}"
+                                style="--tag-bg-color: {{ tag_item.color|default:'#ccc' }}; --tag-text-color: {{ tag_item.get_text_color_for_background|default:'#000' }}; --tag-border-color: {{ tag_item.color|default:'#ccc' }};">
+                                {{ tag_item.name }}
+                            </a>
+                        {% endfor %}
                     </div>
-                    <div class="task-actions-container">
-                        <a href="{% url 'edit_task' task.id %}" class="button button-edit">編集</a>
-                        <form method="post" action="{% url 'delete_task' task.id %}" class="task-delete-form">
-                            {% csrf_token %}
-                            <button type="submit" class="button button-delete">削除</button>
-                        </form>
-                    </div>
-                </li>
-            {% empty %}
-                <li>まだタスクはありません。</li>
-            {% endfor %}
-        </ul>
+                </div>
 
-        <h2>完了済みタスク <span class="task-count">({{ completed_tasks_count }}件)</span></h2> {# ★件数を表示★ #}
-        <ul class="completed-task-list-ul">
-            {% for task in completed_tasks %}
-                <li>
-                    <div class="task-main-content">
-                        <form method="post" action="{% url 'toggle_task' task.id %}" class="task-toggle-form">
-                            {% csrf_token %}
-                            <input type="checkbox" name="is_completed" {% if task.is_completed %}checked{% endif %} onchange="this.form.submit()">
-                        </form>
-                        <div class="task-text-details">
-                            <del class="task-title-text">{{ task.title }}</del>
-                            {% if task.due_date %}
-                                <small class="task-due-date">締め切り：{{ task.due_date|date:"Y-m-d H:i" }}</small>
-                            {% endif %}
-                            {% if task.description %}
-                                <p class="task-description">{{ task.description }}</p>
-                            {% endif %}
-                            {% if task.tags.all %}
-                                <div class="task-tags-container">
-                                    {% for tag_item_inner in task.tags.all %} {# ループ変数を tag_item_inner に #}
-                                        <span class="task-tag">{{ tag_item_inner.name }}</span>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
+                <div class="sidebar-section task-list-section">
+                    {# 未完了タスクのヘッダーを開閉可能にする #}
+                    <h3 class="collapsible-header">未完了のタスク <span class="task-count">({{ incomplete_tasks_count }}件)</span><span class="toggle-icon">-</span></h3>
+                    <div class="collapsible-content"> {# 初期表示は開いた状態 #}
+                        {% if incomplete_tasks %}
+                        <ul class="task-list-ul sidebar-task-list">
+                            {% for task in incomplete_tasks %}
+                                <li>
+                                    <div class="task-main-content-sidebar">
+                                        <form method="post" action="{% url 'toggle_task' task.id %}" class="task-toggle-form">
+                                            {% csrf_token %}
+                                            <input type="checkbox" name="is_completed" {% if task.is_completed %}checked{% endif %} onchange="this.form.submit()">
+                                        </form>
+                                        <div class="task-text-details-sidebar">
+                                            <span class="task-title-text">{{ task.title }}</span>
+                                            {% if task.due_date %}
+                                                <small class="task-due-date">開始：{{ task.due_date|date:"y/m/d H:i" }}</small>
+                                            {% endif %}
+                                            {% if task.end_date %}
+                                                <small class="task-due-date">終了：{{ task.end_date|date:"y/m/d H:i" }}</small>
+                                            {% endif %}
+                                            {% if task.tags.all %}
+                                                <div class="task-tags-container-sidebar">
+                                                    {% for tag_item_inner in task.tags.all %}
+                                                        <span class="task-tag-item-sidebar" title="{{ tag_item_inner.name }}"
+                                                                style="--tag-bg-color: {{ tag_item_inner.color|default:'#ccc' }}; background-color: var(--tag-bg-color);">
+                                                        </span>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="task-actions-container-sidebar">
+                                        <a href="{% url 'edit_task' task.id %}" class="button button-edit button-small">編集</a>
+                                        <form method="post" action="{% url 'delete_task' task.id %}" class="delete-task-form" style="width: auto;">
+                                            {% csrf_token %}
+                                            <button type="submit" class="button button-delete button-small" onclick="return confirm('このタスクを削除してもよろしいですか？');">削除</button>
+                                        </form>
+</div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <p class="no-tasks-sidebar">まだタスクはありません。</p>
+                        {% endif %}
                     </div>
-                    <div class="task-actions-container">
-                        <form method="post" action="{% url 'delete_task' task.id %}" class="task-delete-form">
-                            {% csrf_token %}
-                            <button type="submit" class="button button-delete">削除</button>
-                        </form>
-                        {# <a href="{% url 'edit_task' task.id %}" class="button button-edit">編集</a> #}
-                    </div>
-                </li>
-            {% empty %}
-                <li>完了済みのタスクはありません。</li>
-            {% endfor %}
-        </ul>
+                </div>
 
-        <div class="page-actions">
-            <a href="{% url 'add_task' %}" class="button button-primary">新しいタスクを追加</a> {# button-primary を適用（例） #}
-            <a href="{% url 'deleted_task_list' %}" class="button">削除済みタスク一覧</a>
-        </div>
+                <div class="sidebar-section task-list-section">
+                    <h3 class="collapsible-header">完了済みタスク <span class="task-count">({{ completed_tasks_count }}件)</span><span class="toggle-icon">+</span></h3>
+                    <div class="collapsible-content" style="display: none;">
+                        {% if completed_tasks %}
+                        <ul class="task-list-ul sidebar-task-list completed-sidebar-task-list">
+                            {% for task in completed_tasks %}
+                                <li>
+                                    <div class="task-main-content-sidebar">
+                                        <form method="post" action="{% url 'toggle_task' task.id %}" class="task-toggle-form">
+                                            {% csrf_token %}
+                                            <input type="checkbox" name="is_completed" {% if task.is_completed %}checked{% endif %} onchange="this.form.submit()">
+                                        </form>
+                                        <div class="task-text-details-sidebar">
+                                            <span class="task-title-text"><del>{{ task.title }}</del></span>
+                                            {% if task.due_date %}
+                                                <small class="task-due-date">開始：{{ task.due_date|date:"y/m/d H:i" }}</small>
+                                            {% endif %}
+                                            {% if task.end_date %}
+                                                <small class="task-due-date">終了：{{ task.end_date|date:"y/m/d H:i" }}</small>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="task-actions-container-sidebar">
+                                        <a href="{% url 'edit_task' task.id %}" class="button button-edit button-small">編集</a>
+                                        <form method="post" action="{% url 'delete_task' task.id %}" class="delete-task-form" style="width: auto;">
+                                            {% csrf_token %}
+                                            <button type="submit" class="button button-delete button-small" onclick="return confirm('このタスクを削除してもよろしいですか？');">削除</button>
+                                        </form>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <p class="no-tasks-sidebar">完了済みのタスクはありません。</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <a href="{% url 'deleted_task_list' %}" class="button button-secondary">削除済みタスク一覧</a>
+                </div>
+            </nav>
+        </aside>
+
+        {# === メインコンテンツエリア === #}
+        <main class="main-content" id="mainContent">
+            <div class="calendar-header">
+                <h1>カレンダー</h1>
+                <a href="{% url 'add_task' %}" class="button button-primary add-task-button-calendar-header">タスク追加</a>
+            </div>
+            <div id='calendar'></div>
+        </main>
     </div>
 
-    <div id = "taskDetailModal" class = "modal">
-        <div class ="modal-content">
-            <span class = "modal-close-button">&times;</span>
-            <h3 id = "modalTaskTitle">タスク詳細</h3>
-            <hr>
-            <p><strong>開始日時:</strong><span id = "modalTaskStart"></span></p>
-            <p><strong>終了日時:</strong><span id = "modalTaskEnd"></span></p>
-            <p><strong>詳細</strong></p>
-            <p id ="modalTaskDescription" style = "white-space: pre-wrap;"></p>
-            <p><strong>タグ:</strong><span id = "modalTaskTags"></span></p>
-            <div class = "modal-actions">
-                <a href="#" id="modalEditTaskLink" class="button button-edit">編集する</a>
+    {# --- モーダルウィンドウ --- #}
+    <div id="taskDetailModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close-button">&times;</span>
+            <h3 id="modalTaskTitle"></h3>
+            <p><strong>開始日時:</strong> <span id="modalTaskStart"></span></p>
+            <p><strong>終了日時:</strong> <span id="modalTaskEnd"></span></p>
+            <p><strong>内容:</strong> <span id="modalTaskDescription"></span></p>
+            <p><strong>タグ:</strong> <span id="modalTaskTags"></span></p>
+            <div class="modal-actions">
+                <a href="#" id="modalEditTaskLink" class="button button-edit">編集</a>
+                
             </div>
         </div>
     </div>
 
     <div id="dateClickConfirmModal" class="modal">
-    <div class="modal-content">
-        <span class="modal-close-button" id="dateClickConfirmModalCloseButton">&times;</span>
-        <h3 id="dateClickConfirmModalTitle">新しいタスクの追加</h3>
-        <hr>
-        <p id="dateClickConfirmModalMessage">この日に新しいタスクを追加しますか？</p> 
-        <div class="modal-actions">
-            <button type="button" id="dateClickConfirmModalCancelButton" class="button button-secondary">キャンセル</button>
-            <button type="button" id="dateClickConfirmModalOkButton" class="button button-primary">追加</button>
+        <div class="modal-content">
+            <span class="modal-close-button" id="dateClickConfirmModalCloseButton">&times;</span>
+            <p id="dateClickConfirmModalMessage">この日に新しいタスクを追加しますか？</p>
+            <div class="modal-actions">
+                <button id="dateClickConfirmModalCancelButton" class="button button-secondary">キャンセル</button>
+                <button id="dateClickConfirmModalOkButton" class="button button-primary">はい、追加する</button>
+            </div>
         </div>
     </div>
-</div>
 
-    <script src ="{% static 'fullcalendar-6.1.7/index.global.min.js' %}" defer></script>
-    <script src ="{% static 'fullcalendar-6.1.7/locales-all.global.min.js' %}" defer></script>
-    <script src ="{% static 'js/calendar_style.js' %}" defer></script>
+    <script>
+        var myCalendar;
+    </script>
+    <script src="{% static 'fullcalendar-6.1.7/index.global.min.js' %}" defer></script>
+    <script src="{% static 'fullcalendar-6.1.7/locales-all.global.min.js' %}" defer></script>
+    <script src="{% static 'js/tag_hover_effects.js' %}" defer></script>
+    <script src="{% static 'js/sidebar_toggle.js' %}" defer></script>
+    <script src="{% static 'js/task_list_specific.js' %}" defer></script>
 </body>
 </html>

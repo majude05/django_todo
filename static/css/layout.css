@@ -1,0 +1,349 @@
+/* static/css/layout.css */
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    background-color: #f8f9fa; /* アプリケーション全体の背景色 */
+    color: #343a40;
+    min-height: 100vh;
+    overflow-x: hidden; /* 横スクロールバー防止 */
+    position: relative; /* 固定トグルボタンの配置基準になる場合 */
+}
+
+/* 画面左上固定のトグルボタンのスタイル */
+.sidebar-toggle-button-fixed {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 1050; /* モーダル(1000)、サイドバー(200)よりも手前 */
+    background-color: rgba(255, 255, 255, 0.9); /* 少し透明な背景 */
+    border: 1px solid #ced4da;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    transition: left 0.3s ease, transform 0.3s ease;
+}
+
+.sidebar-toggle-button-fixed svg {
+    width: 20px;
+    height: 20px;
+    stroke: #495057; /* アイコンの色 */
+    transition: transform 0.3s ease;
+}
+
+/* サイドバーが開いている時、トグルボタンを少し右に移動 */
+body.sidebar-is-open .sidebar-toggle-button-fixed {
+    left: calc(280px - 40px - 10px); /* サイドバー幅 - ボタン幅 - 右からのオフセット */
+}
+
+.app-layout {
+    display: flex;
+    width: 100%;
+}
+
+/* --- サイドバー --- */
+.sidebar {
+    width: 280px;
+    min-width: 0;
+    background-color: #ffffff;
+    border-right: 1px solid #dee2e6;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 200;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+    transform: translateX(0%);
+    transition: transform 0.3s ease-in-out, width 0.3s ease-in-out;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 20px;
+}
+
+.sidebar.sidebar-collapsed {
+    transform: translateX(-100%);
+}
+
+.sidebar .sidebar-header-content,
+.sidebar .sidebar-nav {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.2s ease 0.1s, visibility 0s linear;
+}
+
+.sidebar.sidebar-collapsed .sidebar-header-content,
+.sidebar.sidebar-collapsed .sidebar-nav {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.15s ease, visibility 0s linear 0.15s;
+}
+
+.sidebar-header {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #f0f0f0;
+}
+.sidebar-header h2 {
+    margin: 0;
+    font-size: 1.6em;
+    color: #343a40;
+}
+
+.sidebar-nav a.add-task-button-sidebar {
+    display: block;
+    margin-bottom: 25px;
+    text-align: center;
+    padding: 10px 15px;
+    font-size: 0.95em;
+}
+
+.sidebar-section {
+    margin-bottom: 25px;
+}
+.sidebar-section h3 { /* タグ絞り込み、未完了タスク、完了済みタスクのヘッダー共通 */
+    font-size: 1.05em;
+    color: #495057;
+    margin-top: 0;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px dotted #ced4da;
+}
+
+/* 開閉可能なヘッダー (未完了・完了済みタスク共通) */
+.sidebar-section h3.collapsible-header {
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none; /* テキスト選択を防ぐ */
+}
+
+.sidebar-section h3.collapsible-header .toggle-icon {
+    font-size: 0.8em;
+    margin-left: 8px;
+    transition: transform 0.2s ease-in-out;
+}
+
+/* サイドバー内のタグフィルター */
+.sidebar-tag-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.sidebar-tag-filter .tag-filter-button {
+    padding: 5px 12px;
+    font-size: 0.88em;
+}
+
+/* サイドバー内のタスク一覧 (ul要素) */
+.sidebar-task-list {
+    list-style-type: none;
+    padding-left: 0;
+    margin-top: 0;
+    border: 1px solid #f0f0f0;
+    border-radius: 5px;
+}
+.sidebar-task-list li {
+    padding: 10px 12px;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* 縦方向中央揃え */
+    font-size: 0.9em;
+    transition: background-color 0.15s ease;
+}
+.sidebar-task-list li:last-child {
+    border-bottom: none;
+}
+.sidebar-task-list li:hover {
+    background-color: #f8f9fa;
+}
+
+/* サイドバー内タスクのメインコンテンツ部分 */
+.task-main-content-sidebar {
+    display: flex;
+    align-items: center; /* チェックボックスとテキスト情報を垂直中央揃え */
+    flex-grow: 1;
+    overflow: hidden;
+}
+.task-main-content-sidebar input[type="checkbox"] {
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.task-text-details-sidebar {
+    margin-left: 0;
+    flex-grow: 1;
+    overflow: hidden;
+}
+.task-text-details-sidebar .task-title-text {
+    font-size: 0.95em;
+    margin-bottom: 3px;
+    font-weight: 500;
+    color: #212529;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+/* タスクの日時表示 */
+.task-text-details-sidebar .task-due-date {
+    font-size: 0.8em;
+    color: #6c757d;
+    display: block;
+    margin-bottom: 2px; /* 連続する場合の微調整 */
+}
+
+.task-tags-container-sidebar {
+    margin-top: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+.task-tag-item-sidebar { /* タグの色の点 */
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+
+/* サイドバー内のタスクアクションコンテナ */
+.task-actions-container-sidebar {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; /* ボタンを右端に揃える */
+    margin-left: 10px;
+    flex-shrink: 0;
+}
+
+/*
+重要な変更点: 編集ボタン(aタグ)と削除ボタン(buttonタグ)の
+スタイルをできる限り共通化し、差異が出にくいようにします。
+*/
+.task-actions-container-sidebar .button-small, /* a.button-small に適用 */
+.task-actions-container-sidebar .delete-task-form button.button-small { /* button.button-small に適用 */
+    display: inline-flex;         /* Flexboxで内部要素を中央揃え */
+    align-items: center;          /* 垂直中央揃え */
+    justify-content: center;      /* 水平中央揃え */
+    width: 70px;                  /* ★固定幅 (見た目で調整してください) */
+    height: 28px;                 /* ★固定高 (見た目で調整してください) */
+    padding: 0 5px;               /* 上下パディング0、左右パディングで微調整 */
+    font-size: 0.8em;
+    line-height: 1;               /* 行の高さをフォントサイズに合わせる */
+    box-sizing: border-box;       /* paddingとborderをwidth/heightに含める */
+    text-align: center;
+    border-width: 1px;            /* ボーダーの太さを明示 */
+    border-style: solid;          /* ボーダースタイルを明示 */
+    text-decoration: none;        /* aタグの下線を消す */
+    cursor: pointer;              /* カーソルをポインターに */
+    border-radius: 4px;           /* custom_tasks.css の .button と合わせる */
+    font-weight: bold;            /* custom_tasks.css の .button と合わせる */
+    transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, color 0.2s ease-in-out; /* custom_tasks.css と合わせる */
+    white-space: nowrap;          /* テキストの改行を防ぐ */
+}
+
+/* 編集ボタン特有のマージンと色 (色は custom_tasks.css から引っ張ってくるのが理想) */
+.task-actions-container-sidebar .button-edit.button-small {
+    margin-bottom: 5px;
+    background-color: #3498db;   /* custom_tasks.css の .button.button-edit の色 */
+    color: white;
+    border-color: #3498db;
+}
+.task-actions-container-sidebar .button-edit.button-small:hover {
+    background-color: #2980b9;
+    border-color: #2980b9;
+}
+
+.task-actions-container-sidebar .delete-task-form {
+    display: flex;
+    width: auto; /* formの幅を親に合わせることで、中のbuttonのwidth:100%が効く */
+    margin: 0;
+    padding: 0;
+}
+.task-actions-container-sidebar .delete-task-form button.button-small {
+    width: 70px;
+    height: 28px;
+}
+.task-actions-container-sidebar .delete-task-form button.button-small:hover {
+    background-color: #c0392b;
+    border-color: #c0392b;
+}
+
+
+.completed-sidebar-task-list .task-title-text del {
+    color: #6c757d;
+    font-weight: normal;
+}
+.sidebar-section .button-secondary { /* 「削除済みタスク一覧」ボタン */
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+    /* padding, font-size などは custom_tasks.css の .button.button-secondary に依存 */
+}
+
+/* サイドバー内のタスク一覧が空の場合のメッセージ */
+.no-tasks-sidebar {
+    padding: 10px 12px;
+    font-style: italic;
+    color: #6c757d;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+/* --- メインコンテンツエリア --- */
+.main-content {
+    flex-grow: 1;
+    padding: 25px;
+    padding-left: calc(280px + 25px);
+    height: 100vh;
+    box-sizing: border-box;
+    overflow-y: auto;
+    transition: padding-left 0.3s ease-in-out;
+}
+
+.main-content.sidebar-collapsed {
+    padding-left: 25px;
+}
+
+.calendar-header {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.calendar-header h1 {
+    margin: 0;
+    font-size: 1.8em;
+    color: #343a40;
+    border-bottom: none;
+    margin-right: auto; /* タイトルを左、ボタンを右に */
+}
+#calendar {
+    max-width: 100%;
+    /* height: calc(100vh - 100px); */ /* 必要に応じて調整 */
+}
+
+/* 画面が狭い場合のカレンダーヘッダー調整 */
+@media (max-width: 768px) {
+    .calendar-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .calendar-header h1 {
+        margin-bottom: 10px;
+        margin-right: 0;
+    }
+    .add-task-button-calendar-header {
+        margin-left: 0;
+        margin-top: 10px;
+        width: 100%;
+        text-align: center;
+    }
+}

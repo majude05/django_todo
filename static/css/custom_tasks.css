@@ -1,72 +1,69 @@
-/* --- ページ全体の基本スタイル --- */
-body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-    line-height: 1.6;
-    background-color: #f4f4f4; /* 統一された背景色 */
-    color: #333;
-    margin: 0;
-    padding: 20px;
-}
+/* static/css/custom_tasks.css */
 
-.container { /* HTMLのbody直下にこのクラスを持つdivを配置することを推奨 */
+/* --- ページコンテナ (タスク追加/編集ページなどで使用する場合) --- */
+.container {
     max-width: 960px;
-    margin: 0 auto;
+    margin: 20px auto;
     padding: 20px;
     background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-h1, h2 {
+/* --- 見出し (タスク追加/編集ページなどで使用する場合) --- */
+.container h1,
+.container h2 {
     color: #2c3e50;
     border-bottom: 2px solid #3498db;
     padding-bottom: 10px;
     margin-bottom: 20px;
     margin-top: 30px;
 }
-
-h1:first-child, h2:first-child {
+.container h1:first-child,
+.container h2:first-child {
     margin-top: 0;
 }
 
-h2 .task-count {
-    margin-left: 10px;
-    font-size: 0.8em;
-    color: #777;
-    font-weight: normal;
-}
-/* --- タグ絞り込み部分 --- */
+/* --- タグ絞り込み部分 (メインコンテンツ側で使用する場合) --- */
 .tag-filter {
     margin-bottom: 20px;
     padding: 10px;
     background-color: #ecf0f1;
     border-radius: 5px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
 }
 .tag-filter strong {
     margin-right: 10px;
 }
-.tag-filter a {
-    margin-right: 8px;
-    padding: 5px 10px;
-    background-color: #fff;
-    border: 1px solid #bdc3c7;
-    border-radius: 3px;
-    font-size: 0.9em;
+.tag-filter-button {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 16px;
     text-decoration: none;
-    color: #2c3e50;
+    font-size: 0.9em;
+    font-weight: 500;
+    background-color: var(--tag-bg-color, #e9ecef);
+    color: var(--tag-text-color, #495057);
+    border: 1px solid var(--tag-border-color, #ced4da);
+    transition: opacity 0.2s ease-in-out, transform 0.1s ease-in-out, box-shadow 0.2s ease, background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    line-height: 1.2;
+    cursor: pointer;
 }
-.tag-filter a:hover {
-    background-color: #e0e0e0;
+.tag-filter-button:hover {
+    opacity: 0.8;
 }
-.tag-filter a.active-tag { /* class名を .active-tag に統一 */
+.tag-filter-button.active-tag-filter {
+    background-color: var(--tag-bg-color) !important;
+    color: var(--tag-text-color) !important;
+    border-color: var(--tag-border-color) !important;
+    box-shadow: 0 0 0 2px white, 0 0 0 4px var(--tag-border-color, currentColor);
     font-weight: bold;
-    background-color: #3498db;
-    color: white;
-    border-color: #3498db;
 }
 
-
-/* --- タスク一覧の基本スタイル --- */
+/* --- タスク一覧の基本スタイル (メインコンテンツ側で使用する場合) --- */
 ul.task-list-ul,
 ul.completed-task-list-ul {
     list-style-type: none;
@@ -77,7 +74,7 @@ ul.completed-task-list-ul {
 ul.task-list-ul li,
 ul.completed-task-list-ul li {
     display: flex;
-    align-items: flex-start; /* チェックボックスとテキストの行頭を合わせるため */
+    align-items: flex-start;
     margin-bottom: 12px;
     padding: 15px;
     border: 1px solid #ddd;
@@ -86,40 +83,31 @@ ul.completed-task-list-ul li {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-/* --- 各タスクアイテム内の要素 --- */
 .task-main-content {
-    flex-grow: 1; /* 残りのスペースを埋める */
+    flex-grow: 1;
     display: flex;
-    align-items: flex-start; /* チェックボックスとテキストの行頭を合わせる */
+    align-items: flex-start;
 }
 
 .task-main-content input[type="checkbox"] {
     margin-right: 12px;
-    margin-top: 5px; /* テキストとの縦位置微調整 (フォントサイズに依存) */
-    flex-shrink: 0; /* チェックボックスが縮まないように */
+    margin-top: 5px;
+    flex-shrink: 0;
     cursor: pointer;
 }
-
-/*
-.task-text-details {
-}
-*/
-
-
-
 
 .task-title-text {
     font-size: 1.2em;
     font-weight: bold;
     color: #2c3e50;
-    display: block; /* タイトルはブロック要素にして他の情報と区別しやすく */
+    display: block;
     margin-bottom: 5px;
 }
 
 .task-due-date {
     font-size: 0.9em;
-    color: #7f8c8d; /* 少し薄めの色 */
-    display: block; /* 日付もブロック要素に */
+    color: #7f8c8d;
+    display: block;
     margin-bottom: 5px;
 }
 
@@ -127,55 +115,65 @@ ul.completed-task-list-ul li {
     margin-top: 8px;
     font-size: 0.95em;
     color: #34495e;
-    line-height: 1.5; /* 説明文の行間を少し広げる */
+    line-height: 1.5;
 }
 
 .task-tags-container {
-    margin-top: 8px; /* 上の要素との間隔 */
-}
-
-.task-tag { /* クラス名を修正 (taqg -> tag) */
-    background-color: #e0e0e0;
-    color: #555;
-    padding: 3px 8px;
-    border-radius: 12px;
-    font-size: 0.85em;
-    margin-right: 5px;
-    display: inline-block; /* marginやpaddingを正しく適用するため */
-    line-height: 1.4;
-}
-
-/* --- アクションボタンのコンテナと各ボタン --- */
-.task-actions-container { /* クラス名を修正 (action -> actions) */
+    margin-top: 8px;
     display: flex;
-    align-items: center; /* ボタン類を垂直中央に */
-    margin-left: 15px;   /* 左側のタスク内容との間に十分な余白 */
-    flex-shrink: 0;      /* ボタンコンテナが縮まないように */
+    flex-wrap: wrap;
+    gap: 6px 8px;
 }
 
-/* 共通ボタンスタイル */
-/* 共通ボタンスタイル */
-.button {
+.task-tag-item {
     display: inline-block;
-    padding: 8px 15px; /* フォームボタンと共通のpaddingに (例) */
-    border: 1px solid transparent; /* 基本は透明ボーダー */
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    line-height: 1.3;
+    font-weight: 500;
+    background-color: var(--tag-bg-color, #e0e0e0);
+    color: var(--tag-text-color, #555);
+    border: 1px solid var(--tag-border-color, #e0e0e0);
+    transition: opacity 0.2s ease, background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+.task-tag-item:hover {
+    opacity: 0.8;
+}
+
+.task-actions-container { /* メインコンテンツ側のボタンコンテナ */
+    display: flex;
+    align-items: center;
+    margin-left: 15px;
+    flex-shrink: 0;
+}
+
+/* --- 共通ボタンスタイル (アプリケーション全体で統一) --- */
+.button {
+    display: inline-flex; /* 内部要素を中央揃えにしやすくする */
+    align-items: center;   /* 垂直中央揃え */
+    justify-content: center;/* 水平中央揃え */
+    padding: 8px 15px;     /* デフォルトのパディング */
+    border: 1px solid transparent;
     border-radius: 4px;
-    color: white; /* 基本の文字色は白 */
+    color: white;
     text-decoration: none;
     text-align: center;
     cursor: pointer;
-    font-size: 0.9em; /* フォームボタンと共通のフォントサイズに (例) */
-    font-weight: bold; /* ボタンテキストを太字に (任意) */
-    transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+    font-size: 0.9em;
+    font-weight: bold;
+    line-height: 1.2; /* 基本の行の高さを設定 */
+    box-sizing: border-box; /* paddingとborderを幅と高さに含める */
+    transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, color 0.2s ease-in-out;
     margin-left: 8px;
+    white-space: nowrap; /* ボタン内テキストの改行を防ぐ */
 }
-.button:first-child { /* 同一コンテナ内の最初のボタンの左マージンは不要 */
+.button:first-child {
     margin-left: 0;
 }
 
-/* プライマリボタン (緑系: 登録、追加、OKなど) */
-.button.button-primary { /* .button と .button-primary 両方のクラスを持つ要素に適用 */
-    background-color: #2ecc71; /* タスク追加画面の「新しいタスクを追加」ボタンの色に合わせる */
+.button.button-primary {
+    background-color: #2ecc71;
     border-color: #2ecc71;
     color: white;
 }
@@ -184,22 +182,19 @@ ul.completed-task-list-ul li {
     border-color: #27ae60;
 }
 
-/* セカンダリボタン (グレー系: キャンセルなど) */
 .button.button-secondary {
-    background-color: #f0f0f0; /* 既存のセカンダリボタンの色 */
-    color: #333;             /* 文字色を濃いグレーに */
-    border-color: #ccc;       /* 境界線を追加 */
+    background-color: #f0f0f0;
+    color: #333;
+    border-color: #ccc;
 }
 .button.button-secondary:hover {
     background-color: #d9d9d9;
     border-color: #bbb;
 }
 
-/* 編集ボタン (青系) - 既存の定義を活用 */
-.button.button-edit { /* .button と .button-edit 両方のクラスを持つ要素に適用 */
+.button.button-edit {
     background-color: #3498db;
-    /* color: white !important; は .button で指定されていれば不要なはず */
-    color: white; /* 明示的に指定 */
+    color: white;
     border-color: #3498db;
 }
 .button.button-edit:hover {
@@ -207,96 +202,79 @@ ul.completed-task-list-ul li {
     border-color: #2980b9;
 }
 
-/* 削除ボタン (赤系) - 既存の定義を活用 */
-.button.button-delete { /* .button と .button-delete 両方のクラスを持つ要素に適用 */
+.button.button-delete {
     background-color: #e74c3c;
-    /* color: white !important; は .button で指定されていれば不要なはず */
-    color: white; /* 明示的に指定 */
+    color: white;
     border-color: #e74c3c;
 }
 .button.button-delete:hover {
     background-color: #c0392b;
     border-color: #c0392b;
 }
+
+/* ボタンのサイズバリエーション（例：小さいボタン） */
+.button.button-small {
+    font-size: 0.8em;   /* 小さいボタン用のフォントサイズ */
+    padding: 5px 10px; /* 小さいボタン用のパディング */
+    /* width と height は layout.css 側で特定のコンテキストに応じて設定 */
+}
+
+
 /* --- ページ下部のリンクセクション --- */
 .page-actions {
     margin-top: 30px;
     padding-top: 20px;
     border-top: 1px solid #eee;
-    text-align: center; /* 中央寄せにするなど */
+    text-align: center;
 }
-.page-actions a {
-    display: inline-block;
+.page-actions a.button {
     margin: 0 10px;
-    padding: 10px 20px;
-    background-color: #2ecc71; /* 緑系 */
-    color: white;
-    border-radius: 4px;
-    font-weight: bold;
-    text-decoration: none;
-    transition: background-color 0.2s ease-in-out;
 }
-.page-actions a:hover {
-    background-color: #27ae60;
-}
-
 
 /* --- レスポンシブ対応 --- */
 @media (max-width: 768px) {
-    body {
-        padding: 10px; /* スマホではbodyのpaddingを少し減らす */
-    }
-    .container {
-        padding: 15px; /* スマホではcontainerのpaddingも少し減らす */
-    }
-
     ul.task-list-ul li,
     ul.completed-task-list-ul li {
-        flex-direction: column; /* タスクアイテムを縦積みに変更 */
-        align-items: stretch;   /* アイテムを幅いっぱいに伸ばす */
+        flex-direction: column;
+        align-items: stretch;
     }
-
     .task-main-content {
-        margin-bottom: 15px; /* メインコンテンツとアクションの間に十分な余白 */
-        /* width: 100%; 状況によって */
+        margin-bottom: 15px;
     }
     .task-main-content input[type="checkbox"] {
-        margin-top: 2px; /* 縦積み時のチェックボックス位置調整 */
+        margin-top: 2px;
     }
-
-    .task-actions-container { /* クラス名を修正 */
-        margin-left: 0;          /* 左マージンをリセット */
-        flex-direction: row;     /* ボタンを横並びに */
-        justify-content: flex-end; /* 右寄せ */
-        width: 100%;             /* 幅いっぱい */
-        margin-top: 10px;        /* 上の要素との間にマージン */
+    .task-actions-container {
+        margin-left: 0;
+        flex-direction: row;
+        justify-content: flex-end;
+        width: 100%;
+        margin-top: 10px;
     }
-
-    .task-actions-container .button { /* ボタン間のマージンを調整 */
+    .task-actions-container .button {
         margin-left: 8px;
     }
     .task-actions-container .button:first-child {
         margin-left: 0;
     }
-
-    .tag-filter a {
-        display: block; /* スマホではタグをブロック表示にして縦に並べる */
+    .tag-filter a.tag-filter-button {
+        display: block;
         margin-bottom: 5px;
         text-align: center;
     }
-    .tag-filter strong{
+    .tag-filter strong {
         display: block;
         margin-bottom: 8px;
         text-align: center;
     }
-
-    .page-actions a {
+    .page-actions a.button {
         display: block;
-        margin: 10px auto; /* 上下にもマージン、左右はautoで中央 */
+        margin: 10px auto;
     }
 }
 
-.deleted-tasks-action-bar {
+/* --- 削除済みタスク一覧ページのスタイル --- */
+.deleted-tasks-actions-bar {
     margin-bottom: 20px;
     padding: 10px;
     background-color: #f9f9f9;
@@ -304,18 +282,12 @@ ul.completed-task-list-ul li {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
+    gap: 10px;
 }
-
-.deleted-tasks-action-bar > * {
-    margin-right: 10px;
+.deleted-tasks-actions-bar > * {
     margin-bottom: 5px;
 }
-
-.deleted-tasks-action-bar > *:last-child {
-    margin-right: 0;
-}
-
-.deleted-tasks-action-bar label {
+.deleted-tasks-actions-bar label.custom-checkbox-container {
     margin-left: -5px;
     cursor: pointer;
 }
@@ -325,7 +297,6 @@ ul.deleted-task-list {
     padding-left: 0;
     margin-top: 10px;
 }
-
 ul.deleted-task-list li {
     display: flex;
     align-items: flex-start;
@@ -336,37 +307,30 @@ ul.deleted-task-list li {
     background-color: #ffffff;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
-
 ul.deleted-task-list li .task-main-content {
     flex-grow: 1;
     display: flex;
     align-items: flex-start;
 }
-
 ul.deleted-task-list li .task-main-content input[type="checkbox"].task-checkbox {
     margin-right: 12px;
     margin-top: 5px;
     flex-shrink: 0;
     cursor: pointer;
 }
-
-/*確認必要*/
 ul.deleted-task-list li .task-text-details {
     flex-grow: 1;
     margin-left: 15px;
     display: flex;
     flex-direction: column;
 }
-
 ul.deleted-task-list li .task-text-details del.task-title-text{
     font-size: 1.2em;
     font-weight: bold;
-    margin-bottom: 5px;
     color: #a94442;
     display: block;
     margin-bottom: 5px;
 }
-
 ul.deleted-task-list li .task-actions-container {
     display: flex;
     align-items: center;
@@ -374,77 +338,32 @@ ul.deleted-task-list li .task-actions-container {
     flex-shrink: 0;
 }
 
-.button-delete-all {
-    background-color: #d9534f;
-}
-.button-delete-all:hover {
-    background-color: #c9302c;
-}
-.button-restore{
-    background-color: #5cb0de;
-}
-.button-restore-all:hover {
-    background-color: #31b0d5;
-}
-
-.button{
-    display: inline-block;
-    border: 1px solid transparent;
-    padding: 7px 12px;
-    border-radius: 4px;
-    color: #333;
-    cursor: pointer;
-    text-decoration: none;
-    text-align: center;
-    font-size: 0.85em;
-    font-weight: bold;
-    transition: background-color 0.2s ease-in-out,border-color 0.2s ease-in-out;
-    margin-left: 8px;
-}
-
-.button:first-child {
-    margin-left: 0;
-}
-
-.button-action {
+/* 削除済みタスク一覧用のボタン（色は共通ボタンクラスで定義） */
+.button-action { /* 「選択」ボタンなど */
     background-color: #5bc0de;
     color: white;
     border-color: #269abc;
 }
-
 .button-action:hover {
     background-color: #31b0d5;
     border-color: #269abc;
 }
 
-.button-secondary {
-    background-color: #f0f0f0;
-    color: #333;
-    border: 1px solid #ccc;
-}
-
-.button-secondary:hover {
-    background-color: #d9d9d9;
-    border-color: #bbb;
-}
-
+/* カスタムチェックボックス */
 .custom-checkbox-container {
     display: inline-flex;
     align-items: center;
     cursor: pointer;
-    margin-right: 10px;
     font-size: 0.9em;
     color: #495057;
     user-select: none;
 }
-
 .custom-checkbox-container input[type="checkbox"] {
     opacity: 0;
     width: 0;
     height: 0;
     position: absolute;
 }
-
 .custom-checkbox-checkmark {
     display: inline-block;
     width: 18px;
@@ -456,12 +375,10 @@ ul.deleted-task-list li .task-actions-container {
     position: relative;
     transition: background-color 0.15s ease-in-out,border-color 0.15s ease-in-out;
 }
-
 .custom-checkbox-container input[type="checkbox"]:checked + .custom-checkbox-checkmark {
     background-color: #007bff;
     border-color: #007bff;
 }
-
 .custom-checkbox-checkmark:after {
     content: "";
     position: absolute;
@@ -474,19 +391,12 @@ ul.deleted-task-list li .task-actions-container {
     border-width: 0 2px 2px 0;
     transform: rotate(45deg);
 }
-
 .custom-checkbox-container input[type="checkbox"]:checked + .custom-checkbox-checkmark:after {
     display: block;
-}
-
-.custom-checkbox-container .custom-checkbox-label {
-    font-size: 0.9em;
-    color: #495057;
 }
 
 #selected-count-display {
     margin-left: 10px;
     font-size: 0.85em;
     color: #555;
-    
 }

@@ -27,3 +27,23 @@ class Tag(models.Model):
 
     def __str__(self):
         return self.name
+    
+    #背景色に基づいて見やすいテキスト色を設定
+    def get_text_color_for_background(self):
+        hex_color = self.color.lstrip('#')
+        if len(hex_color) == 6:
+            try:
+                r, g, b = tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
+                brightness = (r * 299 + g * 587 + b * 114) / 1000
+                return '#000000' if brightness < 186 else '#FFFFFF'
+            except ValueError:
+                return '#000000'
+        elif len(hex_color) == 3:
+            try:
+                r, g, b = tuple(int(hex_color[i:i+1] * 2, 16) for i in (0, 1, 2))
+                brightness = (r * 299 + g * 587 + b * 114) / 1000
+                return '#000000' if brightness < 186 else '#FFFFFF'
+            except ValueError:
+                return '#000000'
+        else:
+            return '#000000'
