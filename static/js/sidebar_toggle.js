@@ -1,57 +1,40 @@
 // static/js/sidebar_toggle.js
 document.addEventListener('DOMContentLoaded', function() {
     const sidebar = document.getElementById('appSidebar');
-    const mainContent = document.getElementById('mainContent');
-    const toggleButton = document.getElementById('sidebarToggle'); // 画面固定のトグルボタン
+    const toggleButton = document.getElementById('sidebarToggle');
     const body = document.body;
 
-    if (!sidebar) {
-        console.error("Sidebar element (id='appSidebar') not found.");
-        return;
-    }
-    if (!mainContent) {
-        console.error("Main content element (id='mainContent') not found.");
-        return;
-    }
-    if (!toggleButton) {
-        console.error("Sidebar toggle button (id='sidebarToggle') not found.");
+    if (!sidebar || !toggleButton) {
+        console.error("Sidebar or toggleButton element not found.");
         return;
     }
 
-    const applySidebarState = (isCollapsed) => {
-        if (isCollapsed) {
-            sidebar.classList.add('sidebar-collapsed');
-            mainContent.classList.add('sidebar-collapsed'); // メインコンテンツのpadding調整用
-            body.classList.add('sidebar-is-collapsed');     // bodyに状態クラス追加 (ボタン位置調整などに使用可)
+    // サイドバーの状態を適用し、localStorageに保存する関数
+    const applySidebarState = (isCollapsing) => {
+        if (isCollapsing) {
+            body.classList.add('sidebar-is-collapsed');
             body.classList.remove('sidebar-is-open');
+            localStorage.setItem('sidebarCollapsed', 'true');
         } else {
-            sidebar.classList.remove('sidebar-collapsed');
-            mainContent.classList.remove('sidebar-collapsed');
             body.classList.remove('sidebar-is-collapsed');
             body.classList.add('sidebar-is-open');
+            localStorage.setItem('sidebarCollapsed', 'false');
         }
-        localStorage.setItem('sidebarCollapsed', isCollapsed.toString()); // 文字列として保存
 
         // FullCalendarのサイズ再描画をトリガー
-        if (window.myCalendar && typeof window.myCalendar.updateSize === 'function') {
-            // アニメーション完了後に再描画
-            setTimeout(() => {
+        // CSSトランジションの完了を待つ
+        setTimeout(() => {
+            if (window.myCalendar && window.myCalendar.updateSize) {
+                console.log("Sidebar toggle: Forcing FullCalendar updateSize after transition (400ms).");
                 window.myCalendar.updateSize();
-                console.log("FullCalendar size updated after sidebar toggle.");
-            }, 350); // CSSのtransition時間より少し長めに設定
-        } else {
-            // カレンダーがないページや、myCalendarが未定義の場合の警告
-            // console.warn("window.myCalendar is not defined or not a FullCalendar instance.");
-        }
+            } else {
+                console.warn("Sidebar toggle: window.myCalendar or updateSize not found at this time.");
+            }
+        }, 400); // CSS transition (0.3s) より少し長めに設定
     };
 
-    // 初期状態をlocalStorageから読み込む
-    // localStorageの値は文字列なので、'true'と比較
-    const initialIsCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
-    applySidebarState(initialIsCollapsed);
-
     toggleButton.addEventListener('click', function() {
-        const isCurrentlyCollapsed = sidebar.classList.contains('sidebar-collapsed');
-        applySidebarState(!isCurrentlyCollapsed); // 現在の状態を反転
+        const isCurrentlyOpen = body.classList.contains('sidebar-is-open');
+        applySidebarState(isCurrentlyOpen);
     });
 });

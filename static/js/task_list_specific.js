@@ -6,19 +6,15 @@ document.addEventListener('DOMContentLoaded', function() {
         const content = header.nextElementSibling;
         const icon = header.querySelector('.toggle-icon');
 
-        // 未完了タスクの初期表示状態を設定 (デフォルトで開く)
         if (header.textContent.includes('未完了のタスク') && content) {
-            // 初期状態で開いておく場合は何もしないか、明示的に display = "block"
-            // アイコンも対応するものを表示
             if (icon) icon.textContent = '-';
-        } else if (content) { // 完了タスクは初期状態で閉じる
+        } else if (content) {
             content.style.display = "none";
             if (icon) icon.textContent = '+';
         }
 
-
         header.addEventListener('click', function() {
-            if (content) { // content が null でないことを確認
+            if (content) {
                 const isHidden = content.style.display === "none" || content.style.display === "";
                 content.style.display = isHidden ? "block" : "none";
                 if (icon) icon.textContent = isHidden ? '-' : '+';
@@ -26,13 +22,25 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // FullCalendarの初期化処理 (変更なし)
     var calendarEl = document.getElementById('calendar');
     if (calendarEl) {
+        const initialSidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+        const body = document.body;
+
+        // サイドバーの初期状態をbodyクラスにまず適用
+        if (initialSidebarCollapsed) {
+            body.classList.add('sidebar-is-collapsed');
+            body.classList.remove('sidebar-is-open');
+        } else {
+            body.classList.remove('sidebar-is-collapsed');
+            body.classList.add('sidebar-is-open');
+        }
+
         window.myCalendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
             locale: 'ja',
             height: 'auto',
+            // windowResizeDelay: 250, // 必要であれば調整
             headerToolbar: {
                 left: 'prev,next today',
                 center: 'title',
@@ -46,7 +54,6 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             eventClick: function(info) {
                 info.jsEvent.preventDefault();
-
                 const title = info.event.title;
                 const startDateTime = info.event.start;
                 const endDateTime = info.event.end;
@@ -98,10 +105,46 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             },
             loading: function(isLoading) {
-                // ローディング処理
+                const calendarContainer = document.getElementById('calendar');
+                if (isLoading) {
+                    if (calendarContainer) calendarContainer.classList.add('calendar-loading');
+                } else {
+                    if (calendarContainer) calendarContainer.classList.remove('calendar-loading');
+                }
+            },
+            viewDidMount: function(info) {
+                if (window.myCalendar && window.myCalendar.updateSize) {
+                    // 二重のrequestAnimationFrameで、より描画が安定するのを待つ
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            console.log("viewDidMount: Forcing FullCalendar updateSize via double requestAnimationFrame.");
+                            window.myCalendar.updateSize();
+                        });
+                    });
+                }
             }
         });
+
         window.myCalendar.render();
+        console.log("FullCalendar rendered (task_list_specific.js)");
+
+        // DOMContentLoaded直後の遅延実行 - 遅延を200msに
+        setTimeout(() => {
+            if (window.myCalendar && window.myCalendar.updateSize) {
+                console.log("DOMContentLoaded: Forcing FullCalendar updateSize after short delay (200ms).");
+                window.myCalendar.updateSize();
+            }
+        }, 200); // 150ms -> 200ms (前回のユーザー提供コードは150msだったので、ここを最終調整案に合わせる)
+
+        // window.onload を使って、すべてのリソース読み込み後に再度リサイズ - 遅延を300msに
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                if (window.myCalendar && window.myCalendar.updateSize) {
+                    console.log("window.onload: Forcing FullCalendar updateSize after longer delay (300ms).");
+                    window.myCalendar.updateSize();
+                }
+            }, 300); // 250ms -> 300ms (前回のユーザー提供コードは250msだったので、ここを最終調整案に合わせる)
+        });
     }
 
     // モーダル関連の処理 (変更なし)

@@ -8,6 +8,11 @@ body {
     min-height: 100vh;
     overflow-x: hidden; /* 横スクロールバー防止 */
     position: relative; /* 固定トグルボタンの配置基準になる場合 */
+    box-sizing: border-box; /* ★変更: bodyにも適用 */
+}
+
+*, *::before, *::after { /* ★変更: グローバルにborder-boxを適用 */
+    box-sizing: inherit;
 }
 
 /* 画面左上固定のトグルボタンのスタイル */
@@ -15,7 +20,7 @@ body {
     position: fixed;
     top: 15px;
     left: 15px;
-    z-index: 1050; /* モーダル(1000)、サイドバー(200)よりも手前 */
+    z-index: 1050;
     background-color: rgba(255, 255, 255, 0.9); /* 少し透明な背景 */
     border: 1px solid #ced4da;
     border-radius: 50%;
@@ -27,62 +32,66 @@ body {
     justify-content: center;
     cursor: pointer;
     box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-    transition: left 0.3s ease, transform 0.3s ease;
+    transition: left 0.3s ease; /* ★変更: transform は不要かも */
 }
 
 .sidebar-toggle-button-fixed svg {
     width: 20px;
     height: 20px;
     stroke: #495057; /* アイコンの色 */
-    transition: transform 0.3s ease;
+    /* transition: transform 0.3s ease; アイコン自体のtransformアニメーションは必須ではない */
 }
 
 /* サイドバーが開いている時、トグルボタンを少し右に移動 */
 body.sidebar-is-open .sidebar-toggle-button-fixed {
-    left: calc(280px - 40px - 10px); /* サイドバー幅 - ボタン幅 - 右からのオフセット */
+    /* サイドバーの幅(300px) - ボタンの幅(40px) - ボタンの右オフセット(10px) */
+    left: calc(300px - 40px - 10px); /* ★変更: サイドバー幅を300pxに */
 }
 
 .app-layout {
     display: flex;
-    width: 100%;
+    /* width: 100%; body が100%なので通常は不要 */
 }
 
 /* --- サイドバー --- */
 .sidebar {
-    width: 280px;
-    min-width: 0;
+    width: 300px; /* ★変更: ユーザー指定の幅 */
+    min-width: 300px; /* ★変更: ユーザー指定の幅、縮まないように */
     background-color: #ffffff;
     border-right: 1px solid #dee2e6;
-    height: 100vh;
-    position: fixed;
+    height: 100vh; /* 画面の高さに合わせる */
+    position: fixed; /* 画面左に固定 */
     left: 0;
     top: 0;
-    z-index: 200;
+    z-index: 200; /* メインコンテンツより手前 */
     box-shadow: 2px 0 8px rgba(0,0,0,0.1);
-    transform: translateX(0%);
-    transition: transform 0.3s ease-in-out, width 0.3s ease-in-out;
-    overflow-y: auto;
+    transform: translateX(-100%); /* ★変更: 初期状態は隠す */
+    transition: transform 0.3s ease-in-out; /* ★変更: width の transition は削除 */
+    overflow-y: auto; /* 内容が多い場合にスクロール */
     overflow-x: hidden;
-    padding: 20px;
+    padding: 20px; /* サイドバー自体の内側パディング */
+    box-sizing: border-box; /* paddingを含めてwidthを300pxに保つ */
 }
 
-.sidebar.sidebar-collapsed {
-    transform: translateX(-100%);
+/* JSで body.sidebar-is-open クラスが付与されたら表示 */
+body.sidebar-is-open .sidebar {
+    transform: translateX(0%);
 }
 
-.sidebar .sidebar-header-content,
-.sidebar .sidebar-nav {
+/* サイドバー内コンテンツの表示制御 (JSでbodyにクラスを付ける前提) */
+body.sidebar-is-collapsed .sidebar .sidebar-header-content,
+body.sidebar-is-collapsed .sidebar .sidebar-nav {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.15s ease, visibility 0s linear 0.15s; /* 閉じる時 */
+}
+body.sidebar-is-open .sidebar .sidebar-header-content, /* 開くとき */
+body.sidebar-is-open .sidebar .sidebar-nav {
     opacity: 1;
     visibility: visible;
     transition: opacity 0.2s ease 0.1s, visibility 0s linear;
 }
 
-.sidebar.sidebar-collapsed .sidebar-header-content,
-.sidebar.sidebar-collapsed .sidebar-nav {
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.15s ease, visibility 0s linear 0.15s;
-}
 
 .sidebar-header {
     margin-bottom: 20px;
@@ -106,7 +115,7 @@ body.sidebar-is-open .sidebar-toggle-button-fixed {
 .sidebar-section {
     margin-bottom: 25px;
 }
-.sidebar-section h3 { /* タグ絞り込み、未完了タスク、完了済みタスクのヘッダー共通 */
+.sidebar-section h3 {
     font-size: 1.05em;
     color: #495057;
     margin-top: 0;
@@ -115,13 +124,12 @@ body.sidebar-is-open .sidebar-toggle-button-fixed {
     border-bottom: 1px dotted #ced4da;
 }
 
-/* 開閉可能なヘッダー (未完了・完了済みタスク共通) */
 .sidebar-section h3.collapsible-header {
     cursor: pointer;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    user-select: none; /* テキスト選択を防ぐ */
+    user-select: none;
 }
 
 .sidebar-section h3.collapsible-header .toggle-icon {
@@ -130,7 +138,6 @@ body.sidebar-is-open .sidebar-toggle-button-fixed {
     transition: transform 0.2s ease-in-out;
 }
 
-/* サイドバー内のタグフィルター */
 .sidebar-tag-filter {
     display: flex;
     flex-wrap: wrap;
@@ -141,7 +148,6 @@ body.sidebar-is-open .sidebar-toggle-button-fixed {
     font-size: 0.88em;
 }
 
-/* サイドバー内のタスク一覧 (ul要素) */
 .sidebar-task-list {
     list-style-type: none;
     padding-left: 0;
@@ -154,7 +160,7 @@ body.sidebar-is-open .sidebar-toggle-button-fixed {
     border-bottom: 1px solid #f0f0f0;
     display: flex;
     justify-content: space-between;
-    align-items: center; /* 縦方向中央揃え */
+    align-items: center;
     font-size: 0.9em;
     transition: background-color 0.15s ease;
 }
@@ -165,10 +171,9 @@ body.sidebar-is-open .sidebar-toggle-button-fixed {
     background-color: #f8f9fa;
 }
 
-/* サイドバー内タスクのメインコンテンツ部分 */
 .task-main-content-sidebar {
     display: flex;
-    align-items: center; /* チェックボックスとテキスト情報を垂直中央揃え */
+    align-items: center;
     flex-grow: 1;
     overflow: hidden;
 }
@@ -191,12 +196,11 @@ body.sidebar-is-open .sidebar-toggle-button-fixed {
     overflow: hidden;
     text-overflow: ellipsis;
 }
-/* タスクの日時表示 */
 .task-text-details-sidebar .task-due-date {
     font-size: 0.8em;
     color: #6c757d;
     display: block;
-    margin-bottom: 2px; /* 連続する場合の微調整 */
+    margin-bottom: 2px;
 }
 
 .task-tags-container-sidebar {
@@ -204,7 +208,7 @@ body.sidebar-is-open .sidebar-toggle-button-fixed {
     white-space: nowrap;
     overflow: hidden;
 }
-.task-tag-item-sidebar { /* タグの色の点 */
+.task-tag-item-sidebar {
     display: inline-block;
     width: 10px;
     height: 10px;
@@ -213,45 +217,39 @@ body.sidebar-is-open .sidebar-toggle-button-fixed {
     vertical-align: middle;
 }
 
-/* サイドバー内のタスクアクションコンテナ */
 .task-actions-container-sidebar {
     display: flex;
     flex-direction: column;
-    align-items: flex-end; /* ボタンを右端に揃える */
+    align-items: flex-end;
     margin-left: 10px;
     flex-shrink: 0;
 }
 
-/*
-重要な変更点: 編集ボタン(aタグ)と削除ボタン(buttonタグ)の
-スタイルをできる限り共通化し、差異が出にくいようにします。
-*/
-.task-actions-container-sidebar .button-small, /* a.button-small に適用 */
-.task-actions-container-sidebar .delete-task-form button.button-small { /* button.button-small に適用 */
-    display: inline-flex;         /* Flexboxで内部要素を中央揃え */
-    align-items: center;          /* 垂直中央揃え */
-    justify-content: center;      /* 水平中央揃え */
-    width: 70px;                  /* ★固定幅 (見た目で調整してください) */
-    height: 28px;                 /* ★固定高 (見た目で調整してください) */
-    padding: 0 5px;               /* 上下パディング0、左右パディングで微調整 */
+.task-actions-container-sidebar .button-small,
+.task-actions-container-sidebar .delete-task-form button.button-small {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 70px;
+    height: 28px;
+    padding: 0 5px;
     font-size: 0.8em;
-    line-height: 1;               /* 行の高さをフォントサイズに合わせる */
-    box-sizing: border-box;       /* paddingとborderをwidth/heightに含める */
+    line-height: 1;
+    box-sizing: border-box;
     text-align: center;
-    border-width: 1px;            /* ボーダーの太さを明示 */
-    border-style: solid;          /* ボーダースタイルを明示 */
-    text-decoration: none;        /* aタグの下線を消す */
-    cursor: pointer;              /* カーソルをポインターに */
-    border-radius: 4px;           /* custom_tasks.css の .button と合わせる */
-    font-weight: bold;            /* custom_tasks.css の .button と合わせる */
-    transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, color 0.2s ease-in-out; /* custom_tasks.css と合わせる */
-    white-space: nowrap;          /* テキストの改行を防ぐ */
+    border-width: 1px;
+    border-style: solid;
+    text-decoration: none;
+    cursor: pointer;
+    border-radius: 4px;
+    font-weight: bold;
+    transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, color 0.2s ease-in-out;
+    white-space: nowrap;
 }
 
-/* 編集ボタン特有のマージンと色 (色は custom_tasks.css から引っ張ってくるのが理想) */
 .task-actions-container-sidebar .button-edit.button-small {
     margin-bottom: 5px;
-    background-color: #3498db;   /* custom_tasks.css の .button.button-edit の色 */
+    background-color: #3498db;
     color: white;
     border-color: #3498db;
 }
@@ -262,7 +260,7 @@ body.sidebar-is-open .sidebar-toggle-button-fixed {
 
 .task-actions-container-sidebar .delete-task-form {
     display: flex;
-    width: auto; /* formの幅を親に合わせることで、中のbuttonのwidth:100%が効く */
+    width: auto;
     margin: 0;
     padding: 0;
 }
@@ -275,20 +273,17 @@ body.sidebar-is-open .sidebar-toggle-button-fixed {
     border-color: #c0392b;
 }
 
-
 .completed-sidebar-task-list .task-title-text del {
     color: #6c757d;
     font-weight: normal;
 }
-.sidebar-section .button-secondary { /* 「削除済みタスク一覧」ボタン */
+.sidebar-section .button-secondary {
     display: block;
     width: 100%;
     box-sizing: border-box;
     text-align: center;
-    /* padding, font-size などは custom_tasks.css の .button.button-secondary に依存 */
 }
 
-/* サイドバー内のタスク一覧が空の場合のメッセージ */
 .no-tasks-sidebar {
     padding: 10px 12px;
     font-style: italic;
@@ -300,37 +295,63 @@ body.sidebar-is-open .sidebar-toggle-button-fixed {
 /* --- メインコンテンツエリア --- */
 .main-content {
     flex-grow: 1;
-    padding: 25px;
-    padding-left: calc(280px + 25px);
-    height: 100vh;
+    /* 上下のパディングは維持、左右のパディングは状態によって変更 */
+    padding-top: 25px;
+    padding-bottom: 25px;
+    padding-right: 25px; /* ★変更: 右パディングは常に25px */
+    /* 左パディングは下のセレクタで制御 */
     box-sizing: border-box;
+    height: 100vh;
     overflow-y: auto;
-    transition: padding-left 0.3s ease-in-out;
+    overflow-x: hidden;
+    transition: margin-left 0.3s ease-in-out, padding-left 0.3s ease-in-out; /* ★変更: padding-left もトランジション対象に */
+
+    /* サイドバーが閉じている状態がデフォルト */
+    margin-left: 0;
+    padding-left: calc(25px + 60px); /* ★変更: 通常の左パディング25px + トグルボタン避け60px */
+    /* width は flex-grow:1 で自動調整される想定 */
 }
 
-.main-content.sidebar-collapsed {
-    padding-left: 25px;
+body.sidebar-is-open .main-content {
+    margin-left: 300px; /* ★変更: サイドバーの幅(300px)分だけ右にずらす */
+    padding-left: 25px; /* ★変更: サイドバーが開いているときは、通常の左パディングのみ */
+    /* width は flex-grow:1 で自動調整される想定 */
 }
 
+/* カレンダーヘッダー（「カレンダー」タイトルや「タスク追加」ボタンのコンテナ） */
 .calendar-header {
     margin-bottom: 20px;
     display: flex;
     align-items: center;
     flex-wrap: wrap;
+    /* width: 100%; 親要素(.main-content)のパディング内で調整されるので通常不要 */
+    /* padding-leftの個別制御は不要に。親のpaddingで制御 */
+    box-sizing: border-box;
 }
+
 .calendar-header h1 {
     margin: 0;
     font-size: 1.8em;
     color: #343a40;
     border-bottom: none;
-    margin-right: auto; /* タイトルを左、ボタンを右に */
-}
-#calendar {
-    max-width: 100%;
-    /* height: calc(100vh - 100px); */ /* 必要に応じて調整 */
+    margin-right: auto;
 }
 
-/* 画面が狭い場合のカレンダーヘッダー調整 */
+#calendar {
+    /* max-width: 100%; 親要素に依存するので通常不要 */
+    margin: 0;
+}
+
+/* FullCalendarのツールバー */
+.fc .fc-toolbar {
+    /* width: 100%; 親要素に依存するので通常不要 */
+    /* padding-leftの個別制御は不要に。親のpaddingで制御 */
+    box-sizing: border-box;
+    /* margin-bottom はFullCalendarデフォルト */
+}
+
+
+/* 画面が狭い場合の調整 */
 @media (max-width: 768px) {
     .calendar-header {
         flex-direction: column;
@@ -345,5 +366,13 @@ body.sidebar-is-open .sidebar-toggle-button-fixed {
         margin-top: 10px;
         width: 100%;
         text-align: center;
+    }
+
+    /* スマートフォンなどではトグルボタン避けのパディングを少し調整 */
+    body:not(.sidebar-is-open) .main-content { /* ★変更: .main-content に直接適用 */
+        padding-left: calc(25px + 55px); /* 通常の左パディング25px + トグルボタン避け55px */
+    }
+    body.sidebar-is-open .main-content { /* ★変更: .main-content に直接適用 */
+        padding-left: 25px;
     }
 }
