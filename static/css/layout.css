@@ -368,7 +368,7 @@ body.sidebar-is-open .main-content {
     .add-task-button-calendar-header {
         margin-left: 0;
         margin-top: 10px;
-        width: 100%;
+        width: auto;
         text-align: center;
     }
 
