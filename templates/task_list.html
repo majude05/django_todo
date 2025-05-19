@@ -19,12 +19,13 @@
     <div class="app-layout">
         {# === サイドバーメニュー === #}
         <aside class="sidebar" id="appSidebar">
-            <div class="sidebar-header">
-                <div class="sidebar-header-content">
-                    <h2>タスク管理</h2>
+            <div class = "sidebar-sticky-content">
+                <div class="sidebar-header">
+                    <div class="sidebar-header-content">
+                        <h2>タスク管理</h2>
+                    </div>
                 </div>
-            </div>
-            <nav class="sidebar-nav">
+
                 <a href="{% url 'add_task' %}" class="button button-primary add-task-button-sidebar">新しいタスクを追加</a>
 
                 <div class="sidebar-section">
@@ -44,7 +45,9 @@
                         {% endfor %}
                     </div>
                 </div>
+            </div>
 
+            <nav class = "sidebar-nav">
                 <div class="sidebar-section task-list-section">
                     {# 未完了タスクのヘッダーを開閉可能にする #}
                     <h3 class="collapsible-header">未完了のタスク <span class="task-count">({{ incomplete_tasks_count }}件)</span><span class="toggle-icon">-</span></h3>
@@ -83,7 +86,7 @@
                                             {% csrf_token %}
                                             <button type="submit" class="button button-delete button-small" onclick="return confirm('このタスクを削除してもよろしいですか？');">削除</button>
                                         </form>
-</div>
+                                    </div>
                                 </li>
                             {% endfor %}
                         </ul>

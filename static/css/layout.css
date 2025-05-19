@@ -8,10 +8,10 @@ body {
     min-height: 100vh;
     overflow-x: hidden; /* 横スクロールバー防止 */
     position: relative; /* 固定トグルボタンの配置基準になる場合 */
-    box-sizing: border-box; /* ★変更: bodyにも適用 */
+    box-sizing: border-box;
 }
 
-*, *::before, *::after { /* ★変更: グローバルにborder-boxを適用 */
+*, *::before, *::after {
     box-sizing: inherit;
 }
 
@@ -21,7 +21,7 @@ body {
     top: 15px;
     left: 15px;
     z-index: 1050;
-    background-color: rgba(255, 255, 255, 0.9); /* 少し透明な背景 */
+    background-color: rgba(255, 255, 255, 0.9);
     border: 1px solid #ced4da;
     border-radius: 50%;
     width: 40px;
@@ -40,31 +40,27 @@ body {
     stroke: #495057;
 }
 
-
-
 .app-layout {
     display: flex;
-    /* width: 100%; body が100%なので通常は不要 */
 }
 
 /* --- サイドバー --- */
 .sidebar {
-    width: 300px; /* ★変更: ユーザー指定の幅 */
-    min-width: 300px; /* ★変更: ユーザー指定の幅、縮まないように */
+    width: 300px;
+    min-width: 300px;
     background-color: #ffffff;
     border-right: 1px solid #dee2e6;
-    height: 100vh; /* 画面の高さに合わせる */
-    position: fixed; /* 画面左に固定 */
+    height: 100vh;
+    position: fixed;
     left: 0;
     top: 0;
-    z-index: 200; /* メインコンテンツより手前 */
+    z-index: 200;
     box-shadow: 2px 0 8px rgba(0,0,0,0.1);
-    transform: translateX(-100%); /* ★変更: 初期状態は隠す */
-    transition: transform 0.3s ease-in-out; /* ★変更: width の transition は削除 */
-    overflow-y: auto; /* 内容が多い場合にスクロール */
-    overflow-x: hidden;
-    padding: 20px; /* サイドバー自体の内側パディング */
-    box-sizing: border-box; /* paddingを含めてwidthを300pxに保つ */
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+    overflow-y: auto; /* サイドバー全体でスクロール可能にする */
+    /* padding: 20px; /* ★削除: 固定ヘッダーとスクロールコンテンツで個別にパディングを設定 */
+    box-sizing: border-box;
 }
 
 /* JSで body.sidebar-is-open クラスが付与されたら表示 */
@@ -72,42 +68,127 @@ body.sidebar-is-open .sidebar {
     transform: translateX(0%);
 }
 
+/* ▼▼▼ sticky 適用のための変更箇所 ▼▼▼ */
+
+/* サイドバー上部に固定するコンテンツのラッパー */
+.sidebar-sticky-content {
+    position: -webkit-sticky; /* Safari対応 */
+    position: sticky;
+    top: 0; /* スクロールコンテナ（.sidebar）の上端に固定 */
+    background-color: #ffffff; /* スクロール時に下のコンテンツが透けないように */
+    z-index: 10; /* 他のサイドバー内要素より手前に表示されるように */
+    padding: 20px 20px 10px 20px; /* 上左右に20px、下に10pxのパディング */
+}
+
+/* 固定ヘッダー内のメニュータイトル */
+.sidebar-sticky-content .sidebar-header { /* HTML構造に合わせて調整 */
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #f0f0f0;
+}
+.sidebar-sticky-content .sidebar-header h2 { /* HTML構造に合わせて調整 */
+    margin: 0;
+    font-size: 1.6em;
+    color: #343a40;
+    line-height: 1; /* ボタンの高さと合わせるため微調整 */
+    padding-top: 5px; /* ボタンとの垂直位置を合わせるための微調整 */
+    padding-bottom: 5px; /* ボタンとの垂直位置を合わせるための微調整 */
+    transition: margin-left 0.3s ease-in-out;
+}
+/* 固定部分のタイトルとトグルボタンの干渉を避けるスタイル */
+body.sidebar-is-open .sidebar-sticky-content .sidebar-header h2 {
+    margin-left: 40px; /* ユーザー指定の値 */
+}
+
+/* 固定ヘッダー内の「新しいタスクを追加」ボタン */
+.sidebar-sticky-content .add-task-button-sidebar { /* HTML構造に合わせて調整 */
+    display: block;
+    margin-bottom: 20px; /* タグフィルターとの間のマージン */
+    text-align: center;
+    padding: 10px 15px;
+    font-size: 0.95em;
+}
+
+/* 固定ヘッダー内のタグフィルターセクション */
+.sidebar-sticky-content #tag-filter-section-for-sticky { /* HTML構造とIDに合わせて調整 */
+    margin-bottom: 0; /* ラッパーの padding-bottom で調整するため */
+}
+.sidebar-sticky-content #tag-filter-section-for-sticky h3 { /* HTML構造に合わせて調整 */
+    font-size: 1.05em;
+    color: #495057;
+    margin-top: 0;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px dotted #ced4da;
+}
+.sidebar-sticky-content #tag-filter-section-for-sticky .sidebar-tag-filter { /* HTML構造に合わせて調整 */
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.sidebar-sticky-content #tag-filter-section-for-sticky .sidebar-tag-filter .tag-filter-button { /* HTML構造に合わせて調整 */
+    padding: 5px 12px;
+    font-size: 0.88em;
+}
+
+
+/* サイドバーのスクロールするナビゲーション部分 */
+.sidebar-nav {
+    /* 元の .sidebar の padding: 20px; のうち、
+       固定ヘッダーが担当しなかった左右下のパディングをここで設定 */
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 20px;
+    /* 固定部分との間に隙間が欲しい場合は padding-top を追加 */
+    /* padding-top: 10px; */
+}
+
+/* ▲▲▲ sticky 適用のための変更箇所 ▲▲▲ */
+
+
 /* サイドバー内コンテンツの表示制御 (JSでbodyにクラスを付ける前提) */
-body.sidebar-is-collapsed .sidebar .sidebar-header-content,
-body.sidebar-is-collapsed .sidebar .sidebar-nav {
+/* sidebar-header-content は sidebar-sticky-content の中にあるので、親の opacity に依存 */
+body.sidebar-is-collapsed .sidebar .sidebar-sticky-content, /* 固定部分全体をアニメーション対象に */
+body.sidebar-is-collapsed .sidebar .sidebar-nav { /* スクロール部分全体をアニメーション対象に */
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.15s ease, visibility 0s linear 0.15s; /* 閉じる時 */
 }
-body.sidebar-is-open .sidebar .sidebar-header-content, /* 開くとき */
-body.sidebar-is-open .sidebar .sidebar-nav {
+body.sidebar-is-open .sidebar .sidebar-sticky-content, /* 固定部分全体をアニメーション対象に */
+body.sidebar-is-open .sidebar .sidebar-nav { /* スクロール部分全体をアニメーション対象に */
     opacity: 1;
     visibility: visible;
     transition: opacity 0.2s ease 0.1s, visibility 0s linear;
 }
 
 
-.sidebar-header {
+/* .sidebar-header と .sidebar-header h2 は
+   .sidebar-sticky-content の子孫要素としてスタイルが適用されるように、
+   上記の .sidebar-sticky-content 内のセレクタで詳細を記述しました。
+   重複を避けるため、元のグローバルな .sidebar-header, .sidebar-header h2 の定義は
+   必要に応じてコメントアウトまたは削除、あるいは .sidebar-nav 内のみに適用されるように調整します。
+   ここでは、元の定義を残しつつ、sticky内部のものを優先させる形で記述しています。
+   もし完全に分離するなら、以下は .sidebar-nav 内のものとして限定するか、削除します。
+*/
+.sidebar-nav .sidebar-header { /* スクロール部分にヘッダーがある場合（現状はない） */
     margin-bottom: 20px;
     padding-bottom: 15px;
     border-bottom: 1px solid #f0f0f0;
 }
-.sidebar-header h2 {
+.sidebar-nav .sidebar-header h2 { /* スクロール部分にヘッダーがある場合（現状はない） */
     margin: 0;
-    margin-bottom: 0;
-
     font-size: 1.6em;
     color: #343a40;
     line-height: 1;
     padding-top: 5px;
     padding-bottom: 5px;
-    transition: margin-left 0.3s ease-in-out;
 }
 
-body.sidebar-is-open .sidebar .sidebar-header h2 {
-    margin-left: 40px;
-}
 
+/* .sidebar-nav a.add-task-button-sidebar は .sidebar-sticky-content の中に移動したので、
+   ここでの定義は不要になります。もしスクロール部分にも同様のボタンがあるなら残します。
+*/
+/*
 .sidebar-nav a.add-task-button-sidebar {
     display: block;
     margin-bottom: 25px;
@@ -115,11 +196,12 @@ body.sidebar-is-open .sidebar .sidebar-header h2 {
     padding: 10px 15px;
     font-size: 0.95em;
 }
+*/
 
-.sidebar-section {
+.sidebar-nav .sidebar-section { /* .sidebar-nav 内の .sidebar-section に限定 */
     margin-bottom: 25px;
 }
-.sidebar-section h3 {
+.sidebar-nav .sidebar-section h3 { /* .sidebar-nav 内の .sidebar-section h3 に限定 */
     font-size: 1.05em;
     color: #495057;
     margin-top: 0;
@@ -128,7 +210,7 @@ body.sidebar-is-open .sidebar .sidebar-header h2 {
     border-bottom: 1px dotted #ced4da;
 }
 
-.sidebar-section h3.collapsible-header {
+.sidebar-nav .sidebar-section h3.collapsible-header {
     cursor: pointer;
     display: flex;
     justify-content: space-between;
@@ -136,12 +218,16 @@ body.sidebar-is-open .sidebar .sidebar-header h2 {
     user-select: none;
 }
 
-.sidebar-section h3.collapsible-header .toggle-icon {
+.sidebar-nav .sidebar-section h3.collapsible-header .toggle-icon {
     font-size: 0.8em;
     margin-left: 8px;
     transition: transform 0.2s ease-in-out;
 }
 
+/* .sidebar-tag-filter は .sidebar-sticky-content の中に移動したので、
+   ここでの定義は不要になります。
+*/
+/*
 .sidebar-tag-filter {
     display: flex;
     flex-wrap: wrap;
@@ -151,15 +237,16 @@ body.sidebar-is-open .sidebar .sidebar-header h2 {
     padding: 5px 12px;
     font-size: 0.88em;
 }
+*/
 
-.sidebar-task-list {
+.sidebar-nav .sidebar-task-list { /* .sidebar-nav 内のリストに限定 */
     list-style-type: none;
     padding-left: 0;
     margin-top: 0;
     border: 1px solid #f0f0f0;
     border-radius: 5px;
 }
-.sidebar-task-list li {
+.sidebar-nav .sidebar-task-list li { /* .sidebar-nav 内のリストアイテムに限定 */
     padding: 10px 12px;
     border-bottom: 1px solid #f0f0f0;
     display: flex;
@@ -168,30 +255,30 @@ body.sidebar-is-open .sidebar .sidebar-header h2 {
     font-size: 0.9em;
     transition: background-color 0.15s ease;
 }
-.sidebar-task-list li:last-child {
+.sidebar-nav .sidebar-task-list li:last-child {
     border-bottom: none;
 }
-.sidebar-task-list li:hover {
+.sidebar-nav .sidebar-task-list li:hover {
     background-color: #f8f9fa;
 }
 
-.task-main-content-sidebar {
+.sidebar-nav .task-main-content-sidebar {
     display: flex;
     align-items: center;
     flex-grow: 1;
     overflow: hidden;
 }
-.task-main-content-sidebar input[type="checkbox"] {
+.sidebar-nav .task-main-content-sidebar input[type="checkbox"] {
     margin-right: 10px;
     flex-shrink: 0;
 }
 
-.task-text-details-sidebar {
+.sidebar-nav .task-text-details-sidebar {
     margin-left: 0;
     flex-grow: 1;
     overflow: hidden;
 }
-.task-text-details-sidebar .task-title-text {
+.sidebar-nav .task-text-details-sidebar .task-title-text {
     font-size: 0.95em;
     margin-bottom: 3px;
     font-weight: 500;
@@ -200,19 +287,19 @@ body.sidebar-is-open .sidebar .sidebar-header h2 {
     overflow: hidden;
     text-overflow: ellipsis;
 }
-.task-text-details-sidebar .task-due-date {
+.sidebar-nav .task-text-details-sidebar .task-due-date {
     font-size: 0.8em;
     color: #6c757d;
     display: block;
     margin-bottom: 2px;
 }
 
-.task-tags-container-sidebar {
+.sidebar-nav .task-tags-container-sidebar {
     margin-top: 4px;
     white-space: nowrap;
     overflow: hidden;
 }
-.task-tag-item-sidebar {
+.sidebar-nav .task-tag-item-sidebar {
     display: inline-block;
     width: 10px;
     height: 10px;
@@ -221,7 +308,7 @@ body.sidebar-is-open .sidebar .sidebar-header h2 {
     vertical-align: middle;
 }
 
-.task-actions-container-sidebar {
+.sidebar-nav .task-actions-container-sidebar {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
@@ -229,8 +316,8 @@ body.sidebar-is-open .sidebar .sidebar-header h2 {
     flex-shrink: 0;
 }
 
-.task-actions-container-sidebar .button-small,
-.task-actions-container-sidebar .delete-task-form button.button-small {
+.sidebar-nav .task-actions-container-sidebar .button-small,
+.sidebar-nav .task-actions-container-sidebar .delete-task-form button.button-small {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -251,44 +338,44 @@ body.sidebar-is-open .sidebar .sidebar-header h2 {
     white-space: nowrap;
 }
 
-.task-actions-container-sidebar .button-edit.button-small {
+.sidebar-nav .task-actions-container-sidebar .button-edit.button-small {
     margin-bottom: 5px;
     background-color: #3498db;
     color: white;
     border-color: #3498db;
 }
-.task-actions-container-sidebar .button-edit.button-small:hover {
+.sidebar-nav .task-actions-container-sidebar .button-edit.button-small:hover {
     background-color: #2980b9;
     border-color: #2980b9;
 }
 
-.task-actions-container-sidebar .delete-task-form {
+.sidebar-nav .task-actions-container-sidebar .delete-task-form {
     display: flex;
     width: auto;
     margin: 0;
     padding: 0;
 }
-.task-actions-container-sidebar .delete-task-form button.button-small {
+.sidebar-nav .task-actions-container-sidebar .delete-task-form button.button-small {
     width: 70px;
     height: 28px;
 }
-.task-actions-container-sidebar .delete-task-form button.button-small:hover {
+.sidebar-nav .task-actions-container-sidebar .delete-task-form button.button-small:hover {
     background-color: #c0392b;
     border-color: #c0392b;
 }
 
-.completed-sidebar-task-list .task-title-text del {
+.sidebar-nav .completed-sidebar-task-list .task-title-text del {
     color: #6c757d;
     font-weight: normal;
 }
-.sidebar-section .button-secondary {
+.sidebar-nav .sidebar-section .button-secondary {
     display: block;
     width: 100%;
     box-sizing: border-box;
     text-align: center;
 }
 
-.no-tasks-sidebar {
+.sidebar-nav .no-tasks-sidebar {
     padding: 10px 12px;
     font-style: italic;
     color: #6c757d;
@@ -299,36 +386,29 @@ body.sidebar-is-open .sidebar .sidebar-header h2 {
 /* --- メインコンテンツエリア --- */
 .main-content {
     flex-grow: 1;
-    /* 上下のパディングは維持、左右のパディングは状態によって変更 */
     padding-top: 25px;
     padding-bottom: 25px;
-    padding-right: 25px; /* ★変更: 右パディングは常に25px */
-    /* 左パディングは下のセレクタで制御 */
+    padding-right: 25px;
     box-sizing: border-box;
     height: 100vh;
     overflow-y: auto;
     overflow-x: hidden;
-    transition: margin-left 0.3s ease-in-out, padding-left 0.3s ease-in-out; /* ★変更: padding-left もトランジション対象に */
-
-    /* サイドバーが閉じている状態がデフォルト */
+    transition: margin-left 0.3s ease-in-out, padding-left 0.3s ease-in-out;
     margin-left: 0;
-    padding-left: 70px; 
+    padding-left: 70px;
 }
 
 body.sidebar-is-open .main-content {
-    margin-left: 300px; /* ★変更: サイドバーの幅(300px)分だけ右にずらす */
-    padding-left: 25px; /* ★変更: サイドバーが開いているときは、通常の左パディングのみ */
-    /* width は flex-grow:1 で自動調整される想定 */
+    margin-left: 300px;
+    padding-left: 25px;
 }
 
-/* カレンダーヘッダー（「カレンダー」タイトルや「タスク追加」ボタンのコンテナ） */
+/* カレンダーヘッダー */
 .calendar-header {
     margin-bottom: 20px;
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    /* width: 100%; 親要素(.main-content)のパディング内で調整されるので通常不要 */
-    /* padding-leftの個別制御は不要に。親のpaddingで制御 */
     box-sizing: border-box;
 }
 
@@ -342,16 +422,11 @@ body.sidebar-is-open .main-content {
 }
 
 #calendar {
-    /* max-width: 100%; 親要素に依存するので通常不要 */
     margin: 0;
 }
 
-/* FullCalendarのツールバー */
 .fc .fc-toolbar {
-    /* width: 100%; 親要素に依存するので通常不要 */
-    /* padding-leftの個別制御は不要に。親のpaddingで制御 */
     box-sizing: border-box;
-    /* margin-bottom はFullCalendarデフォルト */
 }
 
 
@@ -372,11 +447,10 @@ body.sidebar-is-open .main-content {
         text-align: center;
     }
 
-    /* スマートフォンなどではトグルボタン避けのパディングを少し調整 */
-    body:not(.sidebar-is-open) .main-content { /* ★変更: .main-content に直接適用 */
-        padding-left: 65px; /* 通常の左パディング25px + トグルボタン避け55px */
+    body:not(.sidebar-is-open) .main-content {
+        padding-left: 65px;
     }
-    body.sidebar-is-open .main-content { /* ★変更: .main-content に直接適用 */
+    body.sidebar-is-open .main-content {
         padding-left: 15px;
     }
 }
