@@ -32,21 +32,15 @@ body {
     justify-content: center;
     cursor: pointer;
     box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-    transition: left 0.3s ease; /* ★変更: transform は不要かも */
 }
 
 .sidebar-toggle-button-fixed svg {
     width: 20px;
     height: 20px;
-    stroke: #495057; /* アイコンの色 */
-    /* transition: transform 0.3s ease; アイコン自体のtransformアニメーションは必須ではない */
+    stroke: #495057;
 }
 
-/* サイドバーが開いている時、トグルボタンを少し右に移動 */
-body.sidebar-is-open .sidebar-toggle-button-fixed {
-    /* サイドバーの幅(300px) - ボタンの幅(40px) - ボタンの右オフセット(10px) */
-    left: calc(300px - 40px - 10px); /* ★変更: サイドバー幅を300pxに */
-}
+
 
 .app-layout {
     display: flex;
@@ -100,8 +94,18 @@ body.sidebar-is-open .sidebar .sidebar-nav {
 }
 .sidebar-header h2 {
     margin: 0;
+    margin-bottom: 0;
+
     font-size: 1.6em;
     color: #343a40;
+    line-height: 1;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    transition: margin-left 0.3s ease-in-out;
+}
+
+body.sidebar-is-open .sidebar .sidebar-header h2 {
+    margin-left: 40px;
 }
 
 .sidebar-nav a.add-task-button-sidebar {
@@ -308,8 +312,7 @@ body.sidebar-is-open .sidebar .sidebar-nav {
 
     /* サイドバーが閉じている状態がデフォルト */
     margin-left: 0;
-    padding-left: calc(25px + 60px); /* ★変更: 通常の左パディング25px + トグルボタン避け60px */
-    /* width は flex-grow:1 で自動調整される想定 */
+    padding-left: 70px; 
 }
 
 body.sidebar-is-open .main-content {
@@ -331,6 +334,7 @@ body.sidebar-is-open .main-content {
 
 .calendar-header h1 {
     margin: 0;
+    line-height: 0.8;
     font-size: 1.8em;
     color: #343a40;
     border-bottom: none;
@@ -370,9 +374,9 @@ body.sidebar-is-open .main-content {
 
     /* スマートフォンなどではトグルボタン避けのパディングを少し調整 */
     body:not(.sidebar-is-open) .main-content { /* ★変更: .main-content に直接適用 */
-        padding-left: calc(25px + 55px); /* 通常の左パディング25px + トグルボタン避け55px */
+        padding-left: 65px; /* 通常の左パディング25px + トグルボタン避け55px */
     }
     body.sidebar-is-open .main-content { /* ★変更: .main-content に直接適用 */
-        padding-left: 25px;
+        padding-left: 15px;
     }
 }
