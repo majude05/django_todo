@@ -47,3 +47,18 @@ class Tag(models.Model):
                 return '#000000'
         else:
             return '#000000'
+        
+
+class Holiday(models.Model):
+    date = models.DateField(verbose_name="日付", unique=True)
+    name = models.CharField(verbose_name="祝日名", max_length=100)
+    created_at = models.DateTimeField(verbose_name="作成日時", auto_now_add=True)
+    updated_at = models.DateTimeField(verbose_name="更新日時", auto_now=True)
+
+    class Meta:
+        verbose_name = "祝日"
+        verbose_name_plural = "祝日"
+        ordering = ['date']
+
+    def __str__(self):
+        return f"{self.date.strftime('%Y-%m-%d')} - {self.name}"
