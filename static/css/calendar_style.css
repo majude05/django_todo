@@ -163,3 +163,66 @@
 .fc-day-today .fc-daygrid-day-frame:hover{
     background-color: #ddeeff;
 }
+
+/* --- 曜日ごとのカスタムスタイル --- */
+
+/* 日曜日の日付セルの背景色 */
+.fc .fc-day-sun .fc-daygrid-day-frame {
+    background-color: #ffebee; /* 薄い赤色 */
+}
+/* 日曜日の日付セル (本日) の背景色 */
+.fc .fc-day-sun.fc-day-today .fc-daygrid-day-frame {
+    background-color: #ffcdd2 !important; /* やや濃い赤色 (fc-day-todayより優先) */
+}
+/* 日曜日の日付セル (ホバー時) */
+.fc .fc-day-sun .fc-daygrid-day-frame:hover {
+    background-color: #ffcdd2; /* やや濃い赤色 */
+}
+/* 日曜日の日付セル (本日、ホバー時) */
+.fc .fc-day-sun.fc-day-today .fc-daygrid-day-frame:hover {
+    background-color: #ef9a9a !important; /* さらに濃い赤色 */
+}
+
+
+/* 土曜日の日付セルの背景色 */
+.fc .fc-day-sat .fc-daygrid-day-frame {
+    background-color: #e3f2fd; /* 薄い青色 */
+}
+/* 土曜日の日付セル (本日) の背景色 */
+.fc .fc-day-sat.fc-day-today .fc-daygrid-day-frame {
+    background-color: #bbdefb !important; /* やや濃い青色 (fc-day-todayより優先) */
+}
+/* 土曜日の日付セル (ホバー時) */
+.fc .fc-day-sat .fc-daygrid-day-frame:hover {
+    background-color: #bbdefb; /* やや濃い青色 */
+}
+/* 土曜日の日付セル (本日、ホバー時) */
+.fc .fc-day-sat.fc-day-today .fc-daygrid-day-frame:hover {
+    background-color: #90caf9 !important; /* さらに濃い青色 */
+}
+
+
+/* 曜日ヘッダーのテキスト色 */
+/* JavaScriptでクラスを付与することを想定 */
+.fc .fc-col-header-cell.fc-day-header-sun .fc-col-header-cell-cushion { /* 日曜日の曜日ヘッダー */
+    color: #e53935; /* 赤色 */
+}
+.fc .fc-col-header-cell.fc-day-header-sat .fc-col-header-cell-cushion { /* 土曜日の曜日ヘッダー */
+    color: #1e88e5; /* 青色 */
+}
+
+/* 祝日の日付セルの背景色 (Holidayモデルと連携する場合) */
+.fc .fc-day-holiday .fc-daygrid-day-frame {
+    background-color: #fff0f5; /* 例: ラベンダーブラッシュ */
+}
+.fc .fc-day-holiday.fc-day-today .fc-daygrid-day-frame {
+    background-color: #ffe0e5 !important;
+}
+.fc .fc-day-holiday .fc-daygrid-day-frame:hover {
+    background-color: #ffe0e5;
+}
+
+/* 祝日の曜日ヘッダー (もし祝日にも色を付けたい場合) */
+.fc .fc-col-header-cell.fc-col-header-holiday .fc-col-header-cell-cushion {
+    color: #d81b60; /* 例: やや濃いピンク */
+}
