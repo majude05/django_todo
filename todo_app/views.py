@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Task, Tag
+from .models import Task, Tag, Holiday # Holiday モデルをインポート
 from .forms import TaskForm
 from django.utils import timezone
 import json
@@ -138,29 +138,49 @@ def task_events_api(request):
     tasks = Task.objects.filter(is_deleted=False, due_date__isnull=False)
     events = []
 
+    # タスクイベントの処理
     for task in tasks:
-        event_color = '#808080'
+        event_color = '#808080'  # デフォルト色
+        text_color = '#FFFFFF'   # デフォルトのテキスト色
         if task.tags.exists():
             first_tag = task.tags.first()
             if first_tag and first_tag.color:
                 event_color = first_tag.color
+                text_color = first_tag.get_text_color_for_background()
+
 
         event_data = {
-            'id': task.id,
+            'id': f"task-{task.id}", # IDが一意になるようにプレフィックスを追加
             'title': task.title,
             'start': task.due_date.isoformat() if task.due_date else None,
             'end': task.end_date.isoformat() if task.end_date else None,
             'backgroundColor': event_color,
             'borderColor': event_color,
-            'textColor': '#FFFFFF',
-            #'url': reverse('edit_task', args=[task.id]),
+            'textColor': text_color,
             'extendedProps': {
+                'type': 'task', # イベントタイプを識別できるように追加
                 'description': task.description or '',
                 'tags': [tag.name for tag in task.tags.all()],
                 'edit_url': reverse('edit_task', args=[task.id]),
             }
         }
-
         events.append(event_data)
+    
+    # 祝日イベントの処理
+    holidays = Holiday.objects.all() # Holidayモデルから全祝日を取得
+    for holiday in holidays:
+        holiday_event_data = {
+            'id': f"holiday-{holiday.id}", # IDが一意になるようにプレフィックスを追加
+            'title': holiday.name, # 祝日名
+            'start': holiday.date.isoformat(), # YYYY-MM-DD 形式
+            'allDay': True,
+            'display': 'background', # 背景イベントとして表示
+            'classNames': ['fc-day-holiday'], # CSSクラスを適用
+            # 必要に応じて、extendedPropsに情報を追加できます
+            'extendedProps': {
+                'type': 'holiday' # イベントタイプを識別できるように追加
+            }
+        }
+        events.append(holiday_event_data)
                 
     return JsonResponse(events, safe=False)
