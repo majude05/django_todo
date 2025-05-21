@@ -39,7 +39,6 @@ class Command(BaseCommand):
         for year in years_to_fetch:
             self.stdout.write(f"{year}年の祝日を取得中...")
             try:
-                # APIリクエストのパラメータ (1月1日から12月31日まで)
                 time_min = datetime.datetime(year, 1, 1).isoformat() + 'Z'
                 time_max = datetime.datetime(year, 12, 31, 23, 59, 59).isoformat() + 'Z'
 
@@ -61,23 +60,21 @@ class Command(BaseCommand):
                 updated_count = 0
                 for event in holidays:
                     summary = event['summary']
-                    # Google Calendar API は 'YYYY-MM-DD' 形式で日付を返す
                     try:
-                        # 'date' フィールドが存在するか確認 (終日イベントの場合)
                         if 'date' in event['start']:
                             holiday_date_str = event['start']['date']
                             holiday_date = dateutil_parser.parse(holiday_date_str).date()
-                        # 'dateTime' フィールドが存在する場合 (時間指定イベント、祝日では通常ないが念のため)
                         elif 'dateTime' in event['start']:
                             holiday_date_str = event['start']['dateTime']
-                            holiday_date = dateutil_parser.parse(holiday_date_str).date() # 日付部分のみ取得
+                            holiday_date = dateutil_parser.parse(holiday_date_str).date() 
                         else:
                             self.stdout.write(self.style.WARNING(f"日付情報が見つからないイベント: {summary}"))
                             continue
 
+                        # update_or_create で is_statutory=True を明示的に指定
                         holiday_obj, created = Holiday.objects.update_or_create(
                             date=holiday_date,
-                            defaults={'name': summary}
+                            defaults={'name': summary, 'is_statutory': True} # ★ ここを変更
                         )
                         if created:
                             saved_count += 1

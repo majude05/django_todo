@@ -226,3 +226,28 @@
 .fc .fc-col-header-cell.fc-col-header-holiday .fc-col-header-cell-cushion {
     color: #d81b60; /* 例: やや濃いピンク */
 }
+
+/* ▼▼▼ 以下を追記 ▼▼▼ */
+
+/* 記念日イベントのスタイル (fc-day-memorial) */
+.fc-daygrid-event.fc-day-memorial, /* DayGridビュー */
+.fc-timegrid-event.fc-day-memorial /* TimeGridビュー (もし使う場合) */ {
+    /* 背景と枠線を透明にしているので、ここでは主に文字スタイルや配置を調整 */
+    color: #2c3e50; /* やや濃いめの文字色 */
+    font-weight: normal; /* 通常の太さ */
+    font-size: 0.8em; /* 少し小さめのフォント */
+    padding: 1px 3px; /* 少しパディングを調整 */
+    z-index: 5; /* 他の背景イベントより手前に表示されるように (必要に応じて調整) */
+    /* pointer-events: none; */ /* クリックなどのインタラクションを完全に無効にする場合 */
+}
+
+/* 記念日イベントのテキストが日付セルの背景色に埋もれないように */
+.fc-daygrid-day-events .fc-daygrid-event.fc-day-memorial .fc-event-title {
+    text-shadow: 0 0 1px white;
+}
+
+/* カレンダーのイベント配置によっては、以下のようなスタイルで
+   記念日イベントが他のイベントと重ならないように調整が必要な場合があります */
+.fc-daygrid-event-harness + .fc-daygrid-event-harness .fc-daygrid-event.fc-day-memorial {
+    margin-top: 1px;
+}

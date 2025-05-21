@@ -138,19 +138,18 @@ def task_events_api(request):
     tasks = Task.objects.filter(is_deleted=False, due_date__isnull=False)
     events = []
 
-    # タスクイベントの処理
+    # タスクイベントの処理 (変更なし)
     for task in tasks:
-        event_color = '#808080'  # デフォルト色
-        text_color = '#FFFFFF'   # デフォルトのテキスト色
+        event_color = '#808080'
+        text_color = '#FFFFFF'
         if task.tags.exists():
             first_tag = task.tags.first()
             if first_tag and first_tag.color:
                 event_color = first_tag.color
                 text_color = first_tag.get_text_color_for_background()
 
-
         event_data = {
-            'id': f"task-{task.id}", # IDが一意になるようにプレフィックスを追加
+            'id': f"task-{task.id}",
             'title': task.title,
             'start': task.due_date.isoformat() if task.due_date else None,
             'end': task.end_date.isoformat() if task.end_date else None,
@@ -158,7 +157,7 @@ def task_events_api(request):
             'borderColor': event_color,
             'textColor': text_color,
             'extendedProps': {
-                'type': 'task', # イベントタイプを識別できるように追加
+                'type': 'task',
                 'description': task.description or '',
                 'tags': [tag.name for tag in task.tags.all()],
                 'edit_url': reverse('edit_task', args=[task.id]),
@@ -166,21 +165,39 @@ def task_events_api(request):
         }
         events.append(event_data)
     
-    # 祝日イベントの処理
-    holidays = Holiday.objects.all() # Holidayモデルから全祝日を取得
+    # 祝日・記念日イベントの処理
+    holidays = Holiday.objects.all()
     for holiday in holidays:
-        holiday_event_data = {
-            'id': f"holiday-{holiday.id}", # IDが一意になるようにプレフィックスを追加
-            'title': holiday.name, # 祝日名
-            'start': holiday.date.isoformat(), # YYYY-MM-DD 形式
-            'allDay': True,
-            'display': 'background', # 背景イベントとして表示
-            'classNames': ['fc-day-holiday'], # CSSクラスを適用
-            # 必要に応じて、extendedPropsに情報を追加できます
-            'extendedProps': {
-                'type': 'holiday' # イベントタイプを識別できるように追加
+        if holiday.is_statutory: # 法定休日の場合
+            holiday_event_data = {
+                'id': f"holiday-statutory-{holiday.id}",
+                'title': holiday.name,
+                'start': holiday.date.isoformat(),
+                'allDay': True,
+                'display': 'background', 
+                'classNames': ['fc-day-holiday'], # 法定休日用のCSSクラス
+                'extendedProps': {
+                    'type': 'statutory_holiday'
+                }
             }
-        }
+        else: # 記念日の場合 (法定休日ではない)
+            holiday_event_data = {
+                'id': f"holiday-memorial-{holiday.id}",
+                'title': holiday.name, # タイトルのみ表示
+                'start': holiday.date.isoformat(),
+                'allDay': True,
+                'display': 'block', # 通常のイベントとして表示
+                # 背景色や枠線は透明にして、曜日の背景色を活かす
+                'backgroundColor': 'transparent', 
+                'borderColor': 'transparent',
+                'textColor': '#333333', # 文字色 (適宜調整)
+                'classNames': ['fc-day-memorial'], # 記念日用のCSSクラス (後で定義)
+                'extendedProps': {
+                    'type': 'memorial_day'
+                }
+                # クリックなどのインタラクションを無効にする場合は下記を追加検討
+                # 'interactive': False 
+            }
         events.append(holiday_event_data)
                 
     return JsonResponse(events, safe=False)

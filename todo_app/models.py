@@ -35,14 +35,14 @@ class Tag(models.Model):
             try:
                 r, g, b = tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
                 brightness = (r * 299 + g * 587 + b * 114) / 1000
-                return '#000000' if brightness < 186 else '#FFFFFF'
+                return '#FFFFFF' if brightness < 160 else '#000000'
             except ValueError:
                 return '#000000'
         elif len(hex_color) == 3:
             try:
                 r, g, b = tuple(int(hex_color[i:i+1] * 2, 16) for i in (0, 1, 2))
                 brightness = (r * 299 + g * 587 + b * 114) / 1000
-                return '#000000' if brightness < 186 else '#FFFFFF'
+                return '#FFFFFF' if brightness < 160 else '#000000'
             except ValueError:
                 return '#000000'
         else:
@@ -52,13 +52,14 @@ class Tag(models.Model):
 class Holiday(models.Model):
     date = models.DateField(verbose_name="日付", unique=True)
     name = models.CharField(verbose_name="祝日名", max_length=100)
+    is_statutory = models.BooleanField(default=True, verbose_name="法定休日")
     created_at = models.DateTimeField(verbose_name="作成日時", auto_now_add=True)
     updated_at = models.DateTimeField(verbose_name="更新日時", auto_now=True)
 
     class Meta:
-        verbose_name = "祝日"
-        verbose_name_plural = "祝日"
+        verbose_name = "祝日・記念日" # 名称を少し一般的に変更
+        verbose_name_plural = "祝日・記念日"
         ordering = ['date']
 
     def __str__(self):
-        return f"{self.date.strftime('%Y-%m-%d')} - {self.name}"
+        return f"{self.date.strftime('%Y-%m-%d')} - {self.name} ({'法定休日' if self.is_statutory else '記念日'})"
