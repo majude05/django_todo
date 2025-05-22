@@ -14,6 +14,26 @@ body {
 *, *::before, *::after {
     box-sizing: inherit;
 }
+/* --- サイドバー --- */
+.sidebar {
+    /*width: 300px;
+    min-width: 300px;*/
+    min-width: 200px;
+    max-width: 600px;
+    background-color: #ffffff;
+    border-right: 1px solid #dee2e6;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 200;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+    /*transform: translateX(-100%);*/
+    transition: width 0.05s linear;
+    overflow-y: auto; /* サイドバー全体でスクロール可能にする */
+    /* padding: 20px; /* ★削除: 固定ヘッダーとスクロールコンテンツで個別にパディングを設定 */
+    box-sizing: border-box;
+}
 
 /* 画面左上固定のトグルボタンのスタイル */
 .sidebar-toggle-button-fixed {
@@ -40,32 +60,43 @@ body {
     stroke: #495057;
 }
 
+/* ▼▼▼ リサイズハンドルのスタイルを追加 ▼▼▼ */
+.sidebar-resizer {
+    width: 5px; /* ハンドルの幅 */
+    height: 100vh;
+    background-color: #e0e0e0; /* ハンドルの色（目立たせたい場合は変更） */
+    cursor: col-resize; /* 水平リサイズカーソル */
+    position: fixed;
+    top: 0;
+    /* left: 300px; */ /* ← JavaScriptで制御 */
+    z-index: 201; /* サイドバーより手前、メインコンテンツやトグルボタンよりは奥 */
+    transition: background-color 0.2s ease;
+}
+.sidebar-resizer:hover {
+    background-color: #c0c0c0; /* ホバー時の色 */
+}
+/* ▲▲▲ リサイズハンドルのスタイルここまで ▲▲▲ */
+
 .app-layout {
     display: flex;
 }
 
-/* --- サイドバー --- */
-.sidebar {
-    width: 300px;
-    min-width: 300px;
-    background-color: #ffffff;
-    border-right: 1px solid #dee2e6;
-    height: 100vh;
-    position: fixed;
-    left: 0;
-    top: 0;
-    z-index: 200;
-    box-shadow: 2px 0 8px rgba(0,0,0,0.1);
-    transform: translateX(-100%);
-    transition: transform 0.3s ease-in-out;
-    overflow-y: auto; /* サイドバー全体でスクロール可能にする */
-    /* padding: 20px; /* ★削除: 固定ヘッダーとスクロールコンテンツで個別にパディングを設定 */
-    box-sizing: border-box;
-}
-
 /* JSで body.sidebar-is-open クラスが付与されたら表示 */
 body.sidebar-is-open .sidebar {
-    transform: translateX(0%);
+    /* transform: translateX(0%); */ /* ← 表示・非表示の制御方法が変わる可能性あり */
+    /* width はJSで設定 */
+    display: flex; /* または block。内容物に応じて */
+    flex-direction: column; /* .sidebar-sticky-content と .sidebar-nav を縦に並べるため */
+}
+
+body:not(.sidebar-is-open) .sidebar {
+    width: 0 !important; /* 閉じているときは幅0 */
+    min-width: 0 !important; /* 閉じているときは最小幅0 */
+    overflow: hidden;
+    border-right: none; /* 閉じているときは境界線も消す */
+}
+body:not(.sidebar-is-open) .sidebar-resizer {
+    display: none; /* サイドバーが閉じていればリサイザーも非表示 */
 }
 
 /* ▼▼▼ sticky 適用のための変更箇所 ▼▼▼ */
@@ -393,14 +424,30 @@ body.sidebar-is-open .sidebar .sidebar-nav { /* スクロール部分全体を�
     height: 100vh;
     overflow-y: auto;
     overflow-x: hidden;
-    transition: margin-left 0.3s ease-in-out, padding-left 0.3s ease-in-out;
-    margin-left: 0;
+    /*margin-left: 0;*/
     padding-left: 70px;
+    transition: margin-left 0.05s linear;
 }
 
+/*
 body.sidebar-is-open .main-content {
     margin-left: 300px;
     padding-left: 25px;
+}
+    */
+
+/* サイドバーが閉じているときのメインコンテンツ */
+body:not(.sidebar-is-open) .main-content {
+    margin-left: 0;
+}
+
+/* ドラッグ中のテキスト選択を無効にする（JSで動的に付与） */
+body.sidebar-resizing,
+body.sidebar-resizing * {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 /* カレンダーヘッダー */
