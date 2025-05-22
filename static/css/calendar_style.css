@@ -294,6 +294,21 @@
 .modal-content p strong {
     color: #555;
 }
+
+/* ★ モーダル内のアクションボタンのスタイル調整 ★ */
+.modal-content .modal-actions {
+    margin-top: 20px;
+    display: flex;            /* Flexboxを有効化 */
+    justify-content: flex-end; /* ボタン類を右端に寄せる */
+    align-items: center;      /* ボタンの高さを揃える（もしボタンの高さが異なる場合）*/
+    gap: 10px;                /* ボタン間のスペース */
+}
+
+/* form要素がFlexアイテムとして正しく振る舞うように */
+.modal-content .modal-actions form {
+    margin: 0; /* form要素のデフォルトマージンをリセット */
+    display: inline-flex; /* 内部のbuttonと揃えるため */
+}
 .modal-actions {
     text-align: right;
     margin-top: 20px;

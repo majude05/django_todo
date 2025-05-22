@@ -45,6 +45,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 info.jsEvent.preventDefault();
 
                 const eventType = info.event.extendedProps.type;
+                const modalEditLink = document.getElementById('modalEditTaskLink');
+                const modalDeleteForm = document.getElementById('modalDeleteTaskForm');
 
                 // ★修正点: タスク以外のイベントクリック時にはタスク詳細モーダルを表示しない
                 if (eventType !== 'task') {
@@ -60,7 +62,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (dateClickConfirmModal) {
                         dateClickConfirmModal.style.display = "block";
                     }
-                    return; // タスク詳細モーダルの処理をスキップ
+                    // 非タスクイベントの場合は編集・削除ボタンを非表示
+                    if (modalEditLink) modalEditLink.style.display = 'none';
+                    if (modalDeleteForm) modalDeleteForm.style.display = 'none'; // ★ 削除フォームも非表示
+                    return;
                 }
 
                 // 以下は eventType が 'task' の場合の既存の処理
@@ -79,19 +84,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 let description = info.event.extendedProps.description || 'なし';
                 let tags = info.event.extendedProps.tags ? info.event.extendedProps.tags.join(', ') : 'なし';
                 let editUrl = info.event.extendedProps.edit_url;
+                let deleteUrl = info.event.extendedProps.delete_url; // ★ delete_url を取得
 
                 document.getElementById('modalTaskTitle').textContent = title;
                 document.getElementById('modalTaskStart').textContent = start;
                 document.getElementById('modalTaskEnd').textContent = end;
-
-                // タスクタイプの場合のみ詳細と編集リンクを設定
                 document.getElementById('modalTaskDescription').textContent = description;
                 document.getElementById('modalTaskTags').textContent = tags;
-                if (editUrl) {
-                    document.getElementById('modalEditTaskLink').href = editUrl;
-                    document.getElementById('modalEditTaskLink').style.display = 'inline-block';
-                } else {
-                    document.getElementById('modalEditTaskLink').style.display = 'none';
+
+                if (editUrl && modalEditLink) {
+                    modalEditLink.href = editUrl;
+                    modalEditLink.style.display = 'inline-block';
+                } else if (modalEditLink) {
+                    modalEditLink.style.display = 'none';
+                }
+
+                // ★ 削除フォームの action を設定し、表示する
+                if (deleteUrl && modalDeleteForm) {
+                    modalDeleteForm.action = deleteUrl;
+                    modalDeleteForm.style.display = 'inline-block'; 
+                } else if (modalDeleteForm) {
+                    modalDeleteForm.style.display = 'none';
                 }
                 
                 document.getElementById('taskDetailModal').style.display = "block";

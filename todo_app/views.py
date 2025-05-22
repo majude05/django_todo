@@ -160,6 +160,7 @@ def task_events_api(request):
                 'description': task.description or '',
                 'tags': [tag.name for tag in task.tags.all()],
                 'edit_url': reverse('edit_task', args=[task.id]),
+                'delete_url': reverse('delete_task', args=[task.id])
             }
         }
         events.append(event_data)

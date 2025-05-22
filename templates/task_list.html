@@ -12,6 +12,7 @@
 </head>
 
 <body>
+    {# ... (サイドバーやカレンダーヘッダーなどの既存HTMLはそのまま) ... #}
     <button id="sidebarToggle" class="sidebar-toggle-button-fixed">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
     </button>
@@ -28,7 +29,7 @@
 
                 <a href="{% url 'add_task' %}" class="button button-primary add-task-button-sidebar">新しいタスクを追加</a>
 
-                <div class="sidebar-section">
+                <div class="sidebar-section" id="tag-filter-section-for-sticky"> {# ID追加の例 (CSSと合わせる) #}
                     <h3>タグで絞り込む</h3>
                     <div class="tag-filter sidebar-tag-filter">
                         <a href="{% url 'task_list' %}"
@@ -49,9 +50,8 @@
 
             <nav class = "sidebar-nav">
                 <div class="sidebar-section task-list-section">
-                    {# 未完了タスクのヘッダーを開閉可能にする #}
                     <h3 class="collapsible-header">未完了のタスク <span class="task-count">({{ incomplete_tasks_count }}件)</span><span class="toggle-icon">-</span></h3>
-                    <div class="collapsible-content"> {# 初期表示は開いた状態 #}
+                    <div class="collapsible-content">
                         {% if incomplete_tasks %}
                         <ul class="task-list-ul sidebar-task-list">
                             {% for task in incomplete_tasks %}
@@ -161,7 +161,12 @@
             <p><strong>タグ:</strong> <span id="modalTaskTags"></span></p>
             <div class="modal-actions">
                 <a href="#" id="modalEditTaskLink" class="button button-edit">編集</a>
-                
+                {# ★ ここから削除ボタンのフォームを追加 ★ #}
+                <form method="post" action="#" id="modalDeleteTaskForm" style="display: inline-block;"> {# actionはJSで設定, display:inline-blockで横並び #}
+                    {% csrf_token %}
+                    <button type="submit" class="button button-delete" onclick="return confirm('このタスクを削除してもよろしいですか？');">削除</button>
+                </form>
+                {# ★ ここまで削除ボタンのフォーム ★ #}
             </div>
         </div>
     </div>
