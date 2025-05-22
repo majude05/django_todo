@@ -33,3 +33,14 @@ ul.deleted-task-list li small {
 ul.deleted-task-list li p {
     margin-left: 25px; /* チェックボックスの幅を考慮したインデントなど */
 }
+
+/* 復元ボタンのスタイル */
+.button.button-restore {
+    background-color: #46c646; /* 落ち着いた緑色 (例: BootstrapのSuccessカラー) */
+    border-color: #4cae4c;   /* 緑色系のボーダー */
+    color: white;             /* 文字色は白 */
+}
+.button.button-restore:hover {
+    background-color: #4cae4c; /* ホバー時も緑色系で少し濃く */
+    border-color: #398439;
+}
