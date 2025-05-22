@@ -1,33 +1,11 @@
 // static/js/task_list_specific.js
+
 document.addEventListener('DOMContentLoaded', function() {
-    // タスクリストの開閉機能 (未完了・完了済み共通化)
-    const collapsibleHeaders = document.querySelectorAll('.collapsible-header');
-    collapsibleHeaders.forEach(header => {
-        const content = header.nextElementSibling;
-        const icon = header.querySelector('.toggle-icon');
-
-        if (header.textContent.includes('未完了のタスク') && content) {
-            if (icon) icon.textContent = '-';
-        } else if (content) {
-            content.style.display = "none";
-            if (icon) icon.textContent = '+';
-        }
-
-        header.addEventListener('click', function() {
-            if (content) {
-                const isHidden = content.style.display === "none" || content.style.display === "";
-                content.style.display = isHidden ? "block" : "none";
-                if (icon) icon.textContent = isHidden ? '-' : '+';
-            }
-        });
-    });
-
     var calendarEl = document.getElementById('calendar');
     if (calendarEl) {
         const initialSidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
         const body = document.body;
 
-        // サイドバーの初期状態をbodyクラスにまず適用
         if (initialSidebarCollapsed) {
             body.classList.add('sidebar-is-collapsed');
             body.classList.remove('sidebar-is-open');
@@ -39,49 +17,86 @@ document.addEventListener('DOMContentLoaded', function() {
         window.myCalendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
             locale: 'ja',
-            height: 'auto',
-            // windowResizeDelay: 250, // 必要であれば調整
+            height: 700, // 'auto' にすると内容に応じて高さが変わる。固定したい場合は具体的な値を設定
+            // contentHeight: 600, // または contentHeight で内容部分の高さを固定
+            dayMaxEvents: 2, // ★ セル内に表示する最大イベント数（祝日名も含むので調整が必要な場合あり）
+                            // true にすると高さに応じて自動調整（ただしセルの高さが可変になる可能性）
+                            // 数字を指定すると、その数を超えたら "+n more" リンク表示
+
             headerToolbar: {
                 left: 'prev,next today',
                 center: 'title',
-                right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+                right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek' // 必要に応じて調整
             },
             events: "/api/task_events/",
-            eventTimeFormat: {
+            eventTimeFormat: { // タスクイベントの時間表示フォーマット
                 hour: '2-digit',
                 minute: '2-digit',
                 hour12: false
             },
+            /*
+            dayNumberFormat: { // 日付表示フォーマット
+                day: 'numeric',
+            },
+            */
+        
+            dayCellContent: function(arg) {
+                // arg.dayNumberText にはデフォルトのテキスト（例: "8日"）が入っている
+                // arg.date は日付のDateオブジェクト
+                // 数字部分だけを取り出す
+                let dayOfMonth = arg.date.getDate(); // Dateオブジェクトから日を取得
+                return dayOfMonth.toString(); // 数字を文字列として返す
+            },
+
             eventClick: function(info) {
-                info.jsEvent.preventDefault();
+                info.jsEvent.preventDefault(); // デフォルトの動作（URL遷移など）を抑制
+
+                // モーダル表示のロジック（タスク、祝日名、記念日名共通で使えるように調整も検討）
+                const eventType = info.event.extendedProps.type;
                 const title = info.event.title;
                 const startDateTime = info.event.start;
-                const endDateTime = info.event.end;
+                const endDateTime = info.event.end; // タスクの場合のみ有効
                 const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
                 const start = startDateTime ? startDateTime.toLocaleString('ja-JP', options) : '未設定';
-                const end = endDateTime ? endDateTime.toLocaleString('ja-JP', options) : '未設定';
-                const description = info.event.extendedProps.description || 'なし';
-                const tags = info.event.extendedProps.tags.join(', ') || 'なし';
-                const editUrl = info.event.extendedProps.edit_url;
+                let end = 'なし'; // デフォルト
+                if (eventType === 'task' && endDateTime) {
+                    end = endDateTime.toLocaleString('ja-JP', options);
+                } else if (eventType === 'task' && !endDateTime) {
+                    end = '未設定';
+                }
+
+
+                let description = info.event.extendedProps.description || 'なし';
+                let tags = info.event.extendedProps.tags ? info.event.extendedProps.tags.join(', ') : 'なし';
+                let editUrl = info.event.extendedProps.edit_url;
+
 
                 document.getElementById('modalTaskTitle').textContent = title;
                 document.getElementById('modalTaskStart').textContent = start;
-                document.getElementById('modalTaskEnd').textContent = end;
-                document.getElementById('modalTaskDescription').textContent = description;
-                document.getElementById('modalTaskTags').textContent = tags;
-                if (editUrl) {
-                    document.getElementById('modalEditTaskLink').href = editUrl;
-                    document.getElementById('modalEditTaskLink').style.display = 'inline-block';
-                } else {
+                document.getElementById('modalTaskEnd').textContent = end; // タスク以外では「なし」
+
+                if (eventType === 'task') {
+                    document.getElementById('modalTaskDescription').textContent = description;
+                    document.getElementById('modalTaskTags').textContent = tags;
+                    if (editUrl) {
+                        document.getElementById('modalEditTaskLink').href = editUrl;
+                        document.getElementById('modalEditTaskLink').style.display = 'inline-block';
+                    } else {
+                        document.getElementById('modalEditTaskLink').style.display = 'none';
+                    }
+                } else { // 祝日・記念日の場合
+                    document.getElementById('modalTaskDescription').textContent = 'なし'; // または祝日の説明など
+                    document.getElementById('modalTaskTags').textContent = 'なし';
                     document.getElementById('modalEditTaskLink').style.display = 'none';
                 }
+
                 document.getElementById('taskDetailModal').style.display = "block";
             },
             dateClick: function(info) {
                 let selectedDateForTaskAdd = info.dateStr;
                 const dateClickConfirmModalMessage = document.getElementById('dateClickConfirmModalMessage');
                 if (dateClickConfirmModalMessage) {
-                    const dateObj = new Date(info.dateStr + 'T00:00:00');
+                    const dateObj = new Date(info.dateStr + 'T00:00:00'); // タイムゾーン考慮が必要な場合は調整
                     const formattedDate = dateObj.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' });
                     dateClickConfirmModalMessage.textContent = `${formattedDate} に新しいタスクを追加しますか？`;
                 }
@@ -92,10 +107,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 const dateClickConfirmModalOkButton = document.getElementById('dateClickConfirmModalOkButton');
                 if(dateClickConfirmModalOkButton){
-                    const newOkButton = dateClickConfirmModalOkButton.cloneNode(true);
+                    const newOkButton = dateClickConfirmModalOkButton.cloneNode(true); // イベントリスナーを再付与するため複製
                     dateClickConfirmModalOkButton.parentNode.replaceChild(newOkButton, dateClickConfirmModalOkButton);
 
-                    newOkButton.onclick = function() {
+                    newOkButton.onclick = function() { // 新しいボタンにイベントリスナーを設定
                         if (selectedDateForTaskAdd) {
                             const addTaskUrl = `/add/?due_date=${selectedDateForTaskAdd}`;
                             window.location.href = addTaskUrl;
@@ -112,42 +127,68 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (calendarContainer) calendarContainer.classList.remove('calendar-loading');
                 }
             },
+            eventDidMount: function(arg) {
+                if (arg.event.extendedProps && arg.event.extendedProps.type === 'statutory_holiday_background') {
+                    let dayCellElement = arg.el.closest('.fc-daygrid-day');
+                    if (dayCellElement) {
+                        dayCellElement.classList.add('fc-day-is-statutory-holiday');
+                    }
+                }
+                // ここで祝日名やタスクの順序をDOM操作で調整することも可能だが、複雑になるため
+                // views.pyでのイベント生成順序とCSSでのスタイリングで対応するのが基本。
+                // もし厳密なDOM順序が必要な場合は、eventOrder オプションや
+                // eventContent フックでのカスタムレンダリングを検討。
+            },
             viewDidMount: function(info) {
                 if (window.myCalendar && window.myCalendar.updateSize) {
-                    // 二重のrequestAnimationFrameで、より描画が安定するのを待つ
                     requestAnimationFrame(() => {
                         requestAnimationFrame(() => {
-                            console.log("viewDidMount: Forcing FullCalendar updateSize via double requestAnimationFrame.");
                             window.myCalendar.updateSize();
                         });
                     });
                 }
+            },
+            // イベントの表示順序を制御 (例: 祝日名を先頭に、次にタスクなど)
+            // eventOrder: 'extendedProps.type,start', // typeでソート (例: 'holiday_name', 'task')
+            // または、より具体的に order プロパティを extendedProps に追加してソート
+            eventOrder: function(eventA, eventB) {
+                const typeOrder = {
+                    'statutory_holiday_name': 1,
+                    'memorial_day_name': 1, // 祝日と記念日を同列1番目に
+                    'task': 2 // タスクを2番目に
+                };
+                const orderA = typeOrder[eventA.extendedProps.type] || 99;
+                const orderB = typeOrder[eventB.extendedProps.type] || 99;
+
+                if (orderA !== orderB) {
+                    return orderA - orderB;
+                }
+                // 同じタイプの場合は開始日でソート（任意）
+                if (eventA.start && eventB.start) {
+                    return eventA.start.valueOf() - eventB.start.valueOf();
+                }
+                return 0;
             }
         });
 
         window.myCalendar.render();
-        console.log("FullCalendar rendered (task_list_specific.js)");
 
-        // DOMContentLoaded直後の遅延実行 - 遅延を200msに
         setTimeout(() => {
             if (window.myCalendar && window.myCalendar.updateSize) {
-                console.log("DOMContentLoaded: Forcing FullCalendar updateSize after short delay (200ms).");
                 window.myCalendar.updateSize();
             }
-        }, 200); // 150ms -> 200ms (前回のユーザー提供コードは150msだったので、ここを最終調整案に合わせる)
+        }, 200);
 
-        // window.onload を使って、すべてのリソース読み込み後に再度リサイズ - 遅延を300msに
         window.addEventListener('load', () => {
             setTimeout(() => {
                 if (window.myCalendar && window.myCalendar.updateSize) {
-                    console.log("window.onload: Forcing FullCalendar updateSize after longer delay (300ms).");
                     window.myCalendar.updateSize();
                 }
-            }, 300); // 250ms -> 300ms (前回のユーザー提供コードは250msだったので、ここを最終調整案に合わせる)
+            }, 300);
         });
     }
 
-    // モーダル関連の処理 (変更なし)
+    // モーダル関連の処理
     const taskDetailModal = document.getElementById('taskDetailModal');
     const taskDetailModalCloseButton = taskDetailModal ? taskDetailModal.querySelector('.modal-close-button') : null;
     if (taskDetailModalCloseButton) {

@@ -1,5 +1,7 @@
+# todo_app/views.py
+
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Task, Tag, Holiday # Holiday モデルをインポート
+from .models import Task, Tag, Holiday
 from .forms import TaskForm
 from django.utils import timezone
 import json
@@ -11,7 +13,7 @@ from datetime import datetime
 def task_list(request, tag_name=None):
     incomplete_tasks_query = Task.objects.filter(is_completed=False, is_deleted=False)
     completed_tasks_query = Task.objects.filter(is_completed=True, is_deleted=False)
-    
+
     if tag_name:
         tag = get_object_or_404(Tag, name=tag_name)
         incomplete_tasks_query = incomplete_tasks_query.filter(tags=tag)
@@ -22,8 +24,6 @@ def task_list(request, tag_name=None):
 
     incomplete_count = incomplete_tasks_query.count()
     completed_count = completed_tasks_query.count()
-
-
 
     tags = Tag.objects.all()
 
@@ -59,9 +59,9 @@ def add_task(request):
                 end_date=form.cleaned_data['end_date'],
             )
             task.save()
-            tags = form.cleaned_data['tags']
-            if tags:
-                task.tags.set(tags)
+            tags_data = form.cleaned_data['tags'] # form.cleaned_data から取得
+            if tags_data:
+                task.tags.set(tags_data)
             return redirect('task_list')
     else:
         form = TaskForm(initial=initial_data)
@@ -75,7 +75,7 @@ def toggle_task(request, task_id):
 
 def delete_task(request,task_id):
     task = get_object_or_404(Task, pk=task_id)
-    task.delete()
+    task.delete() # Taskモデルのカスタムdeleteメソッドが呼ばれる
     return redirect('task_list')
 
 def deleted_task_list(request):
@@ -87,12 +87,8 @@ def deleted_task_list(request):
 def edit_task(request, task_id):
     task = get_object_or_404(Task, pk=task_id)
     if request.method == 'POST':
-        form = TaskForm(request.POST, initial={
-            'title': task.title,
-            'description': task.description,
-            'due_date': task.due_date.strftime('%Y-%m-%dT%H:%M') if task.due_date else None,
-            'tags': task.tags.all()
-        })
+        # POST時の初期データは通常不要、request.POST で新しい値を取得
+        form = TaskForm(request.POST) # instance=task はModelFormの場合
         if form.is_valid():
             task.title = form.cleaned_data['title']
             task.description = form.cleaned_data['description']
@@ -102,9 +98,11 @@ def edit_task(request, task_id):
             task.save()
             return redirect('task_list')
     else:
+        # GET時 (編集フォーム初期表示)
         form = TaskForm(initial={
             'title': task.title,
             'description': task.description,
+            # DateTimeFieldは naiveなdatetimeを期待する場合がある
             'due_date': task.due_date.strftime('%Y-%m-%dT%H:%M') if task.due_date else None,
             'end_date': task.end_date.strftime('%Y-%m-%dT%H:%M') if task.end_date else None,
             'tags': task.tags.all()
@@ -123,25 +121,25 @@ def restore_task(request, task_id):
 
 def delete_all_tasks(request):
     if request.method == 'POST':
-        Task.objects.filter(is_deleted=True).delete()
+        Task.objects.filter(is_deleted=True).delete() # 物理削除
         return redirect('deleted_task_list')
-    
+
 def bulk_delete_tasks(request):
     if request.method == 'POST':
         task_ids_json = request.POST.get('task_ids')
         if task_ids_json:
             task_ids = json.loads(task_ids_json)
-            Task.objects.filter(id__in=task_ids, is_deleted=True).delete()
+            Task.objects.filter(id__in=task_ids, is_deleted=True).delete() # 物理削除
     return redirect('deleted_task_list')
 
 def task_events_api(request):
     tasks = Task.objects.filter(is_deleted=False, due_date__isnull=False)
     events = []
 
-    # タスクイベントの処理 (変更なし)
+    # タスクイベントの処理
     for task in tasks:
-        event_color = '#808080'
-        text_color = '#FFFFFF'
+        event_color = '#808080' # デフォルトグレー
+        text_color = '#FFFFFF' # デフォルト白
         if task.tags.exists():
             first_tag = task.tags.first()
             if first_tag and first_tag.color:
@@ -154,8 +152,9 @@ def task_events_api(request):
             'start': task.due_date.isoformat() if task.due_date else None,
             'end': task.end_date.isoformat() if task.end_date else None,
             'backgroundColor': event_color,
-            'borderColor': event_color,
+            'borderColor': event_color, # 枠線も同色に
             'textColor': text_color,
+            'classNames': ['fc-task-event'], # タスクイベント共通クラス
             'extendedProps': {
                 'type': 'task',
                 'description': task.description or '',
@@ -164,40 +163,59 @@ def task_events_api(request):
             }
         }
         events.append(event_data)
-    
+
     # 祝日・記念日イベントの処理
     holidays = Holiday.objects.all()
     for holiday in holidays:
         if holiday.is_statutory: # 法定休日の場合
-            holiday_event_data = {
-                'id': f"holiday-statutory-{holiday.id}",
+            # --- 1. 法定休日の日付の背景色を変えるための背景イベント ---
+            background_event_data = {
+                'id': f"holiday-bg-statutory-{holiday.id}",
+                'start': holiday.date.isoformat(),
+                'allDay': True,
+                'display': 'background',
+                'backgroundColor': '#ffebee', # 法定休日の初期背景色
+                'extendedProps': {
+                    'type': 'statutory_holiday_background',
+                    'is_statutory': True # JavaScriptで識別用
+                }
+            }
+            events.append(background_event_data)
+
+            # --- 2. 法定休日名を表示するための通常イベント ---
+            name_display_event_data = {
+                'id': f"holiday-name-statutory-{holiday.id}",
                 'title': holiday.name,
                 'start': holiday.date.isoformat(),
                 'allDay': True,
-                'display': 'background', 
-                'classNames': ['fc-day-holiday'], # 法定休日用のCSSクラス
+                'display': 'block',
+                'textColor': '#c62828', # 法定休日の文字色
+                'classNames': ['fc-holiday-name-event', 'fc-statutory-holiday-name'],
                 'extendedProps': {
-                    'type': 'statutory_holiday'
+                    'type': 'statutory_holiday_name',
+                    'is_statutory': True
                 }
+                # backgroundColor, borderColor はCSSで transparent !important にする
             }
-        else: # 記念日の場合 (法定休日ではない)
-            holiday_event_data = {
-                'id': f"holiday-memorial-{holiday.id}",
-                'title': holiday.name, # タイトルのみ表示
+            events.append(name_display_event_data)
+
+        else: # 記念日の場合
+            # --- 記念日の場合は、日付マスの背景色を変更するイベントは追加しない ---
+            # --- 記念日名を表示するための通常イベントのみ追加 ---
+            name_display_event_data = {
+                'id': f"holiday-name-memorial-{holiday.id}",
+                'title': holiday.name,
                 'start': holiday.date.isoformat(),
                 'allDay': True,
-                'display': 'block', # 通常のイベントとして表示
-                # 背景色や枠線は透明にして、曜日の背景色を活かす
-                'backgroundColor': 'transparent', 
-                'borderColor': 'transparent',
-                'textColor': '#333333', # 文字色 (適宜調整)
-                'classNames': ['fc-day-memorial'], # 記念日用のCSSクラス (後で定義)
+                'display': 'block',
+                'textColor': '#3e2723', # 記念日の文字色
+                'classNames': ['fc-holiday-name-event', 'fc-memorial-day-name'],
                 'extendedProps': {
-                    'type': 'memorial_day'
+                    'type': 'memorial_day_name',
+                    'is_statutory': False
                 }
-                # クリックなどのインタラクションを無効にする場合は下記を追加検討
-                # 'interactive': False 
+                # backgroundColor, borderColor はCSSで transparent !important にする
             }
-        events.append(holiday_event_data)
-                
+            events.append(name_display_event_data)
+
     return JsonResponse(events, safe=False)

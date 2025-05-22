@@ -2,37 +2,37 @@
 
 /* カレンダー全体を囲むコンテナのスタイル */
 #calendar-container {
-    margin-top: 20px; /* 上の要素（タスク一覧のタイトルなど）との間隔 */
-    margin-bottom: 30px; /* 下の要素（タグフィルターなど）との間隔 */
-    padding: 20px; /* 内側の余白 */
-    background-color: #ffffff; /* 背景色を白に（コンテナが目立つように） */
-    border: 1px solid #e0e0e0; /* やや薄い境界線 */
-    border-radius: 8px; /* 角を少し丸くする */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* 控えめな影 */
+    margin-top: 20px;
+    margin-bottom: 30px;
+    padding: 20px;
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 /* FullCalendar本体を描画するdivのスタイル */
 #calendar {
-    max-width: 100%; /* 親要素の幅に合わせる */
-    margin: 0 auto;  /* 中央寄せ */
+    max-width: 100%;
+    margin: 0 auto;
 }
 
-/* --- FullCalendarの見た目を調整するカスタムスタイル（例） --- */
+/* --- FullCalendarの見た目を調整するカスタムスタイル --- */
 
-/* ヘッダーツールバーのボタンのスタイルを少し調整 */
-.fc .fc-button { /* FullCalendarが生成するボタンクラス */
+/* ヘッダーツールバーのボタン */
+.fc .fc-button {
     background-color: #f0f0f0;
     border-color: #e0e0e0;
     color: #333;
-    text-transform: none; /* ボタンテキストの大文字化を解除（もしされていれば） */
-    box-shadow: none; /* デフォルトの影を消す */
+    text-transform: none;
+    box-shadow: none;
     transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 .fc .fc-button:hover {
     background-color: #dcdcdc;
     border-color: #c0c0c0;
 }
-.fc .fc-button-primary { /* Todayボタンなど */
+.fc .fc-button-primary {
     background-color: #007bff;
     border-color: #007bff;
     color: white;
@@ -41,59 +41,214 @@
     background-color: #0056b3;
     border-color: #0056b3;
 }
-.fc .fc-button-primary:disabled { /* 無効化されたボタン */
+.fc .fc-button-primary:disabled {
     background-color: #c0c0c0;
     border-color: #c0c0c0;
 }
 
-
-/* カレンダーのタイトル（例: "2025年5月"）のスタイル */
+/* カレンダーのタイトル */
 .fc .fc-toolbar-title {
-    font-size: 1.5em; /* 少し大きく */
-    color: #2c3e50;   /* 見出しと色を合わせる */
+    font-size: 1.5em;
+    color: #2c3e50;
 }
 
-/* イベント（タスク）のデフォルトスタイルを少し調整 */
-.fc-event {
-    border-radius: 3px;
-    font-size: 0.85em;
-    cursor: pointer; /* クリック可能であることを示す */
+/* --- 日付セルの基本スタイル --- */
+.fc .fc-daygrid-day-frame {
+    transition: background-color 0.1s ease-in-out; /* ホバー時の変化を少し速く */
+    position: relative;
+    z-index: 0; /* 他のレイヤーの基準となる一番下のレイヤー */
+    min-height: 100px; /* セルの最低の高さを確保（FullCalendarのデフォルトに近い値か、調整） */
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* --- 日付番号エリアのスタイル --- */
+.fc .fc-daygrid-day-top {
+    display: flex; /* 日付番号と祝日名を縦に並べるため */
+    flex-direction: column; /* 日付番号と祝日名を縦に並べるため */
+    align-items: center; /* 水平中央揃え */
+    text-align: center;  /* 念のため */
+    padding: 2px 0;      /* 上下のわずかなパディング */
+    position: relative; /* z-indexや内部要素の配置のため */
+    z-index: 3;         /* 背景イベントよりは手前、イベント名よりは後ろ */
+    pointer-events: none; /* クリックイベントを邪魔しないように */
+    flex-shrink: 0;
+
+}
+
+.fc .fc-daygrid-day-number {
+    font-size: 0.85em; /* 少し小さくしてスペース確保 */
+    font-weight: bold;
+    padding: 0;
+    width: auto;
+    background-color: transparent;
+    z-index: 4;
+    margin-bottom: 1px; /* 日付と祝日名の間に少しマージン */
+
+}
+
+/* 土曜日の日付番号の文字色 */
+.fc-daygrid-day.fc-day-sat .fc-daygrid-day-number {
+    color: blue !important;
+}
+
+/* 日曜日の日付番号の文字色 */
+.fc-daygrid-day.fc-day-sun .fc-daygrid-day-number {
+    color: red !important;
+}
+
+/* 祝日の日付番号の文字色 (最優先) */
+.fc-daygrid-day.fc-day-is-statutory-holiday .fc-daygrid-day-number {
+    color: red !important; /* 曜日に関わらず赤色を優先 */
+}
+
+/* 今日の日付番号の文字色 (祝日指定がない場合) */
+/* 祝日を優先するため、祝日でない今日の日付にのみ適用 */
+.fc-daygrid-day.fc-day-today:not(.fc-day-is-statutory-holiday) .fc-daygrid-day-number {
+    font-weight: bold; /* 例: 太字にする */
+    font-size: 0.95em;
+    background-color: white;
+    border-radius: 50%;
+    width: 1.5em;
+    height: 1.5em;
+    line-height: 2.0em;
+    text-align: center;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 0 4px rgba(0,0,0,0.2);
+    margin :0 auto;
+    
+}
+
+
+/* --- 曜日ごとのデフォルト背景色とホバー色 --- */
+/* 平日 */
+.fc-daygrid-day:not(.fc-day-sun):not(.fc-day-sat):not(.fc-day-today):not(.fc-day-is-statutory-holiday) .fc-daygrid-day-frame {
+    background-color: white; /* 明示的に白 */
+}
+.fc-daygrid-day:not(.fc-day-sun):not(.fc-day-sat):not(.fc-day-today):not(.fc-day-is-statutory-holiday) .fc-daygrid-day-frame:hover {
+    background-color: #f0f0f0; /* 平日のホバー色 (少し濃いグレー) */
+}
+
+/* 日曜日 */
+.fc-daygrid-day.fc-day-sun:not(.fc-day-is-statutory-holiday) .fc-daygrid-day-frame {
+    background-color: #ffebee;
+}
+.fc-daygrid-day.fc-day-sun:not(.fc-day-is-statutory-holiday) .fc-daygrid-day-frame:hover {
+    background-color: #ffcdd2;
+}
+
+/* 土曜日 */
+.fc-daygrid-day.fc-day-sat:not(.fc-day-is-statutory-holiday) .fc-daygrid-day-frame {
+    background-color: #f0f8ff; /* 土曜の薄い水色 */
+}
+.fc-daygrid-day.fc-day-sat:not(.fc-day-is-statutory-holiday) .fc-daygrid-day-frame:hover {
+    background-color: #e6f2ff; /* 土曜のホバー色 */
+}
+
+/* --- 法定休日のスタイル --- */
+/* 法定休日の背景イベント (views.pyで backgroundColor: '#ffebee' を指定) */
+.fc-daygrid-bg-event {
+    opacity: 1;
+    z-index: 1; /* セルフレームのデフォルト(z-index:0)より手前 */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* JavaScriptで法定休日のセルに付与されたクラス */
+.fc-daygrid-day.fc-day-is-statutory-holiday .fc-daygrid-day-frame {
+    background-color: #ffebee !important; /* 背景イベントの色を活かすため、フレーム自体は透明に */
+}
+.fc-daygrid-day.fc-day-is-statutory-holiday .fc-daygrid-day-frame:hover {
+    background-color: #ffcdd2 !important; /* 法定休日のホバー色を #ffcdd2 に統一 */
+}
+
+/* --- 本日のスタイル (最優先) --- */
+.fc .fc-day-today .fc-daygrid-day-frame {
+    background-color: #00acc1 !important; /* 本日の初期背景色 */
+    z-index: 2 !important; /* 法定休日の背景イベント(z-index:1)よりも手前 */
+}
+.fc .fc-day-today .fc-daygrid-day-frame:hover {
+    background-color: #0097a7 !important; /* 本日のホバー色 */
+}
+/* もし今日が法定休日だった場合のホバー色も本日のホバー色を優先するなら、上記でOK */
+/* もし今日が法定休日だった場合に法定休日のホバー色(#ffcdd2)を優先したいなら、以下を有効化
+.fc-daygrid-day.fc-day-today.fc-day-is-statutory-holiday .fc-daygrid-day-frame:hover {
+    background-color: #ffcdd2 !important;
+}
+*/
+
+
+/* --- イベント（タスク、祝日名、記念日名）の共通スタイル --- */
+.fc-event { /* FullCalendarのイベント要素の基本クラス */
+    
+    font-size: 0.8em; /* 文字サイズを少し小さめに統一 */
+    line-height: 1.3; /* 行間調整 */
+    box-sizing: border-box;
+    overflow: hidden;         /* はみ出した内容は隠す */
+    text-overflow: ellipsis;  /* はみ出した文字は...で表示 */
+    white-space: nowrap;      /* イベントタイトルは1行で表示 */
+    cursor: pointer;
     transition: opacity 0.2s ease;
 }
-.fc-event:hover {
-    opacity: 0.85; /* ホバー時に少し透明にする */
+
+/* 祝日・記念日名 表示用イベントの共通スタイル */
+.fc-event.fc-holiday-name-event {
+    background-color: transparent !important;
+    border-color: transparent !important;
+    text-align: center;
+    width: auto; /* 幅は内容に合わせる */
+    display: block; /* ブロック要素として日付の下に配置 */
+    margin-left: auto;  /* 中央揃えのため */
+    margin-right: auto; /* 中央揃えのため */
+    z-index: 4; /* 日付番号と同じか、やや手前 */
+    /* pointer-events: none; /* クリックを透過させる場合 */
+    /* position, top, left, height は削除 (day-top内で自然に配置) */
 }
 
-/* 日付セルのスタイル（任意） 
-.fc .fc-daygrid-day-frame { /* 日付セル全体を囲むフレーム */
-    /* border-right: 1px solid #f0f0f0; */ /* 縦の区切り線 (もし必要なら) */
-    /* border-bottom: 1px solid #f0f0f0; */ /* 横の区切り線 (もし必要なら) */
-/* } */
-
-.fc .fc-daygrid-day-top { /* 日付番号のエリア */
-    text-align: left; /* 日付番号を左寄せに */
-    padding: 4px;
-}
-.fc .fc-day-today { /* 今日の日付の背景色 */
-    background-color: #fff9e6 !important; /* !important でFullCalendarのデフォルトを上書き */
+/* 法定休日名に特有のスタイル */
+.fc-event.fc-statutory-holiday-name {
+    font-weight: bold;
+    /* textColorはviews.pyで #c62828 に設定済み */
 }
 
-/* listWeek ビューのスタイル調整（もし使う場合） */
-.fc-list-event-dot { /* リストビューのイベントマーカー */
-    border-color: #007bff; /* イベントの色に合わせるなど */
-}
-.fc-list-event-title a { /* リストビューのイベントタイトル */
-    color: #007bff;
-    text-decoration: none;
-}
-.fc-list-event-title a:hover {
-    text-decoration: underline;
+/* 記念日名に特有のスタイル */
+.fc-event.fc-memorial-day-name {
+    font-weight: normal; /* 記念日は太字にしないなど */
+    /* textColorはviews.pyで #3e2723 に設定済み */
 }
 
+/* タスクイベントのスタイル */
+/*.fc-task-event {
+    /*text-align: center;*/
+    /*width: auto;*/
+    /* views.pyでbackgroundColor, borderColor, textColor を設定 */
+    /* 必要であればここで共通のスタイル（例：paddingなど）を調整 */
+/*}*/
+
+
+
+/* --- 曜日ヘッダーのテキスト色 --- */
+.fc-col-header .fc-day-sun .fc-col-header-cell-cushion,
+.fc-col-header-cell-cushion.fc-day-header-sun {
+    color: red !important;
+}
+.fc-col-header .fc-day-sat .fc-col-header-cell-cushion,
+.fc-col-header-cell-cushion.fc-day-header-sat {
+    color: blue !important;
+}
+
+/* --- モーダル関連 (変更なし) --- */
 .modal {
     display: none;
     position: fixed;
-    z-index: 1000;
+    z-index: 10000; /* カレンダーより手前に */
     left: 0;
     top: 0;
     width: 100%;
@@ -102,7 +257,6 @@
     background-color: rgba(0, 0, 0, 0.5);
     padding-top: 60px;
 }
-
 .modal-content {
     background-color: #fefefe;
     margin: 5% auto;
@@ -114,7 +268,6 @@
     box-shadow: 0 15px 15px rgba(0, 0, 0, 0.3);
     position: relative;
 }
-
 .modal-close-button {
     color: #aaa;
     float: right;
@@ -122,132 +275,37 @@
     font-weight: bold;
     line-height: 1;
 }
-
 .modal-close-button:hover,
 .modal-close-button:focus {
     color: #000;
     text-decoration: none;
     cursor: pointer;
 }
-
 .modal-content h3 {
     margin-top: 0;
     color:#333;
     border-bottom: 1px solid #eee;
     padding-bottom: 10px;
 }
-
 .modal-content p {
     margin-bottom: 10px;
     line-height: 1.6;
 }
-
 .modal-content p strong {
     color: #555;
 }
-
 .modal-actions {
     text-align: right;
     margin-top: 20px;
 }
 
-.fc-daygrid-day-frame {
-    transition: background-color 0.2s ease-in-out;
-}
-
-.fc-daygrid-day-frame:hover {
-    background-color: #e9ecef;
-    cursor: pointer;
-}
-
-.fc-day-today .fc-daygrid-day-frame:hover{
-    background-color: #ddeeff;
-}
-
-/* --- 曜日ごとのカスタムスタイル --- */
-
-/* 日曜日の日付セルの背景色 */
-.fc .fc-day-sun .fc-daygrid-day-frame {
-    background-color: #ffebee; /* 薄い赤色 */
-}
-/* 日曜日の日付セル (本日) の背景色 */
-.fc .fc-day-sun.fc-day-today .fc-daygrid-day-frame {
-    background-color: #ffcdd2 !important; /* やや濃い赤色 (fc-day-todayより優先) */
-}
-/* 日曜日の日付セル (ホバー時) */
-.fc .fc-day-sun .fc-daygrid-day-frame:hover {
-    background-color: #ffcdd2; /* やや濃い赤色 */
-}
-/* 日曜日の日付セル (本日、ホバー時) */
-.fc .fc-day-sun.fc-day-today .fc-daygrid-day-frame:hover {
-    background-color: #ef9a9a !important; /* さらに濃い赤色 */
-}
-
-
-/* 土曜日の日付セルの背景色 */
-.fc .fc-day-sat .fc-daygrid-day-frame {
-    background-color: #e3f2fd; /* 薄い青色 */
-}
-/* 土曜日の日付セル (本日) の背景色 */
-.fc .fc-day-sat.fc-day-today .fc-daygrid-day-frame {
-    background-color: #bbdefb !important; /* やや濃い青色 (fc-day-todayより優先) */
-}
-/* 土曜日の日付セル (ホバー時) */
-.fc .fc-day-sat .fc-daygrid-day-frame:hover {
-    background-color: #bbdefb; /* やや濃い青色 */
-}
-/* 土曜日の日付セル (本日、ホバー時) */
-.fc .fc-day-sat.fc-day-today .fc-daygrid-day-frame:hover {
-    background-color: #90caf9 !important; /* さらに濃い青色 */
-}
-
-
-/* 曜日ヘッダーのテキスト色 */
-/* JavaScriptでクラスを付与することを想定 */
-.fc .fc-col-header-cell.fc-day-header-sun .fc-col-header-cell-cushion { /* 日曜日の曜日ヘッダー */
-    color: #e53935; /* 赤色 */
-}
-.fc .fc-col-header-cell.fc-day-header-sat .fc-col-header-cell-cushion { /* 土曜日の曜日ヘッダー */
-    color: #1e88e5; /* 青色 */
-}
-
-/* 祝日の日付セルの背景色 (Holidayモデルと連携する場合) */
-.fc .fc-day-holiday .fc-daygrid-day-frame {
-    background-color: #fff0f5; /* 例: ラベンダーブラッシュ */
-}
-.fc .fc-day-holiday.fc-day-today .fc-daygrid-day-frame {
-    background-color: #ffe0e5 !important;
-}
-.fc .fc-day-holiday .fc-daygrid-day-frame:hover {
-    background-color: #ffe0e5;
-}
-
-/* 祝日の曜日ヘッダー (もし祝日にも色を付けたい場合) */
-.fc .fc-col-header-cell.fc-col-header-holiday .fc-col-header-cell-cushion {
-    color: #d81b60; /* 例: やや濃いピンク */
-}
-
-/* ▼▼▼ 以下を追記 ▼▼▼ */
-
-/* 記念日イベントのスタイル (fc-day-memorial) */
-.fc-daygrid-event.fc-day-memorial, /* DayGridビュー */
-.fc-timegrid-event.fc-day-memorial /* TimeGridビュー (もし使う場合) */ {
-    /* 背景と枠線を透明にしているので、ここでは主に文字スタイルや配置を調整 */
-    color: #2c3e50; /* やや濃いめの文字色 */
-    font-weight: normal; /* 通常の太さ */
-    font-size: 0.8em; /* 少し小さめのフォント */
-    padding: 1px 3px; /* 少しパディングを調整 */
-    z-index: 5; /* 他の背景イベントより手前に表示されるように (必要に応じて調整) */
-    /* pointer-events: none; */ /* クリックなどのインタラクションを完全に無効にする場合 */
-}
-
-/* 記念日イベントのテキストが日付セルの背景色に埋もれないように */
-.fc-daygrid-day-events .fc-daygrid-event.fc-day-memorial .fc-event-title {
-    text-shadow: 0 0 1px white;
-}
-
-/* カレンダーのイベント配置によっては、以下のようなスタイルで
-   記念日イベントが他のイベントと重ならないように調整が必要な場合があります */
-.fc-daygrid-event-harness + .fc-daygrid-event-harness .fc-daygrid-event.fc-day-memorial {
-    margin-top: 1px;
+/* FullCalendarの日付セルのイベント表示数を制御 (dayMaxEventsオプションと併用) */
+.fc-daygrid-day-events {
+    position: relative;
+    overflow: hidden; 
+    max-height: 4.5em;
+    z-index: 3;
+    background-color: transparent !important;
+    flex-grow: 1;
+    min-height: 0;
 }
