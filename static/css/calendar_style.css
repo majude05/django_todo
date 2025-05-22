@@ -309,3 +309,14 @@
     flex-grow: 1;
     min-height: 0;
 }
+
+
+/* todo/static/css/calendar_style.css などに追加 */
+
+.fc-more-popover .fc-popover-header .fc-popover-title {
+    font-weight: bold;
+}
+
+.fc-more-popover .fc-popover-body .fc-more-popover-misc {
+    display: none !important; /* タイトルテキストの要素をレイアウトから完全に削除します */
+}
