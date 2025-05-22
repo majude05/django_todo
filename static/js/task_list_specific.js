@@ -230,4 +230,50 @@ document.addEventListener('DOMContentLoaded', function() {
             dateClickConfirmModalElement.style.display = "none";
         }
     });
+
+    // --- ここからアコーディオン機能のコードを追加 ---
+    const collapsibleHeaders = document.querySelectorAll('.collapsible-header');
+
+    collapsibleHeaders.forEach(header => {
+        header.addEventListener('click', function() {
+            const content = this.nextElementSibling;
+            const icon = this.querySelector('.toggle-icon');
+
+            if (content.style.display === "none" || content.style.display === "") {
+                content.style.display = "block";
+                if (icon) {
+                    icon.textContent = "-";
+                }
+                // 他のセクションを閉じる場合 (任意)
+                // collapsibleHeaders.forEach(otherHeader => {
+                //     if (otherHeader !== this) {
+                //         otherHeader.nextElementSibling.style.display = "none";
+                //         if (otherHeader.querySelector('.toggle-icon')) {
+                //             otherHeader.querySelector('.toggle-icon').textContent = "+";
+                //         }
+                //     }
+                // });
+            } else {
+                content.style.display = "none";
+                if (icon) {
+                    icon.textContent = "+";
+                }
+            }
+        });
+
+        // 初期状態の設定（未完了タスクは開き、完了タスクは閉じる）
+        // HTML側で style="display: none;" が設定されているので、
+        // JavaScript側での初期表示制御は必須ではありませんが、
+        // より明示的に制御したい場合は以下のようにします。
+        const content = header.nextElementSibling;
+        const icon = header.querySelector('.toggle-icon');
+        if (header.classList.contains('completed-task-header')) { // 仮のクラス名
+            if (content) content.style.display = "none";
+            if (icon) icon.textContent = "+";
+        } else {
+            if (content) content.style.display = "block"; // 未完了はデフォルトで開く場合
+            if (icon) icon.textContent = "-";
+        }
+    });
+    // --- アコーディオン機能のコードここまで ---
 });
