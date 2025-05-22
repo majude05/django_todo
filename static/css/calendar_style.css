@@ -200,6 +200,7 @@
 
 /* 祝日・記念日名 表示用イベントの共通スタイル */
 .fc-event.fc-holiday-name-event {
+    color:white !important;
     background-color: transparent !important;
     border-color: transparent !important;
     text-align: center;
@@ -215,12 +216,16 @@
 /* 法定休日名に特有のスタイル */
 .fc-event.fc-statutory-holiday-name {
     font-weight: bold;
+    background-color: red !important;
+    /*border-color: red !important;
     /* textColorはviews.pyで #c62828 に設定済み */
 }
 
 /* 記念日名に特有のスタイル */
 .fc-event.fc-memorial-day-name {
-    font-weight: normal; /* 記念日は太字にしないなど */
+    font-weight: bold;
+    background-color: gray !important;
+    /*border-color: red !important;
     /* textColorはviews.pyで #3e2723 に設定済み */
 }
 

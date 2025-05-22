@@ -190,7 +190,7 @@ def task_events_api(request):
                 'start': holiday.date.isoformat(),
                 'allDay': True,
                 'display': 'block',
-                'textColor': '#c62828', # 法定休日の文字色
+                'textColor': 'white', # 法定休日の文字色
                 'classNames': ['fc-holiday-name-event', 'fc-statutory-holiday-name'],
                 'extendedProps': {
                     'type': 'statutory_holiday_name',
@@ -209,7 +209,7 @@ def task_events_api(request):
                 'start': holiday.date.isoformat(),
                 'allDay': True,
                 'display': 'block',
-                'textColor': '#3e2723', # 記念日の文字色
+                'textColor': 'white', # 記念日の文字色
                 'classNames': ['fc-holiday-name-event', 'fc-memorial-day-name'],
                 'extendedProps': {
                     'type': 'memorial_day_name',
