@@ -25,6 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
             locale: 'ja',
             height: 700,
             dayMaxEvents: 2,
+            displayEventTime: false,
             headerToolbar: {
                 left: 'prev,next today',
                 center: 'title',
