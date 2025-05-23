@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const body = document.body;
 
     const initialSidebarWidth = 300; // 初期幅（CSSの元の値と合わせる）
-    const minSidebarWidth = 200;   // 最小幅（CSSのmin-widthと合わせる）
+    const minSidebarWidth = 250;   // 最小幅（CSSのmin-widthと合わせる）
     const maxSidebarWidth = 600;   // 最大幅（CSSのmax-widthと合わせる）
 
     // --- 既存のトグルボタンの処理 ---
