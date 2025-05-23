@@ -87,26 +87,12 @@ def deleted_task_list(request):
 def edit_task(request, task_id):
     task = get_object_or_404(Task, pk=task_id)
     if request.method == 'POST':
-        # POST時の初期データは通常不要、request.POST で新しい値を取得
-        form = TaskForm(request.POST) # instance=task はModelFormの場合
+        form = TaskForm(request.POST, instance=task) # instance=task を追加
         if form.is_valid():
-            task.title = form.cleaned_data['title']
-            task.description = form.cleaned_data['description']
-            task.due_date = form.cleaned_data['due_date']
-            task.end_date = form.cleaned_data['end_date']
-            task.tags.set(form.cleaned_data['tags'])
-            task.save()
+            form.save() # ModelFormのsaveメソッドで保存
             return redirect('task_list')
     else:
-        # GET時 (編集フォーム初期表示)
-        form = TaskForm(initial={
-            'title': task.title,
-            'description': task.description,
-            # DateTimeFieldは naiveなdatetimeを期待する場合がある
-            'due_date': task.due_date.strftime('%Y-%m-%dT%H:%M') if task.due_date else None,
-            'end_date': task.end_date.strftime('%Y-%m-%dT%H:%M') if task.end_date else None,
-            'tags': task.tags.all()
-        })
+        form = TaskForm(instance=task) # instance=task を指定して初期値を設定
     return render(request, 'edit_task.html', {
         'form': form,
         'task': task
